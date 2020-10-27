@@ -27,7 +27,6 @@ public class BorrowedFragment extends Fragment {
   private TabLayout tabLayout;
   private ViewPager2 viewPager2;
   private PagerAdapter pagerAdapter;
-  private ArrayList<Pair<Class<? extends Fragment>, Bundle>> fragmentClasses = new ArrayList<Pair<Class<? extends Fragment>, Bundle>>();
 
   public BorrowedFragment() {
     // Required empty public constructor
@@ -64,18 +63,18 @@ public class BorrowedFragment extends Fragment {
     TabItem acceptedTab = (TabItem) view.findViewById(R.id.tabs_sub_borrowed_accepted);
 
     // add fragments to tabs
+    pagerAdapter = new PagerAdapter(getChildFragmentManager(), getLifecycle());
     Bundle bundle = new Bundle();
     bundle.putString("msg", "Borrowed");
-    fragmentClasses.add(new Pair<>(GenericListFragment.class, bundle));
+    pagerAdapter.addFragment(new Pair<Class<? extends Fragment>,Bundle>(GenericListFragment.class, bundle));
     bundle = new Bundle();
     bundle.putString("msg", "Requested");
-    fragmentClasses.add(new Pair<>(GenericListFragment.class, bundle));
+    pagerAdapter.addFragment(new Pair<Class<? extends Fragment>,Bundle>(GenericListFragment.class, bundle));
     bundle = new Bundle();
     bundle.putString("msg", "Accepted");
-    fragmentClasses.add(new Pair<>(GenericListFragment.class, bundle));
+    pagerAdapter.addFragment(new Pair<Class<? extends Fragment>,Bundle>(GenericListFragment.class, bundle));
 
     // Configure viewpager2 options and initialize page adapter
-    pagerAdapter = new PagerAdapter(getChildFragmentManager(), getLifecycle(), fragmentClasses);
     viewPager2.setUserInputEnabled(false);
     viewPager2.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
     viewPager2.setOffscreenPageLimit(tabLayout.getTabCount());

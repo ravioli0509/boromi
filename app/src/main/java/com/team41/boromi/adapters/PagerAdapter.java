@@ -15,10 +15,9 @@ public class PagerAdapter extends FragmentStateAdapter {
   private ArrayList<Pair<Class<? extends Fragment>, Bundle>> fragmentClasses;
 
   public PagerAdapter(@NonNull FragmentManager fragmentManager,
-      @NonNull Lifecycle lifecycle,
-      ArrayList<Pair<Class<? extends Fragment>, Bundle>> fragmentClasses) {
+      @NonNull Lifecycle lifecycle) {
     super(fragmentManager, lifecycle);
-    this.fragmentClasses = new ArrayList<>(fragmentClasses);
+    fragmentClasses = new ArrayList<>();
   }
 
   @NonNull
@@ -29,8 +28,8 @@ public class PagerAdapter extends FragmentStateAdapter {
       return FragmentFactory.createFragment(p.first, p.second);
     } catch (InstantiationException | IllegalAccessException e) {
       e.printStackTrace();
+      throw new RuntimeException("Failed to create fragment");
     }
-    return null;
   }
 
   @Override
@@ -38,4 +37,7 @@ public class PagerAdapter extends FragmentStateAdapter {
     return fragmentClasses.size();
   }
 
+  public void addFragment(Pair<Class<? extends Fragment>, Bundle> f) {
+    fragmentClasses.add(f);
+  }
 }

@@ -28,7 +28,6 @@ public class BookActivity extends AppCompatActivity {
   private ViewPager2 viewPager2;
   private PagerAdapter pagerAdapter;
   private TabLayout tabLayout;
-  private ArrayList<Pair<Class<? extends Fragment>, Bundle>> fragmentList = new ArrayList<Pair<Class<? extends Fragment>, Bundle>>();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -44,17 +43,17 @@ public class BookActivity extends AppCompatActivity {
     TabItem tabSettings = findViewById(R.id.tab_settings);
 
     // Add fragments for each tab
-    fragmentList.add(new Pair<>(OwnedFragment.class, null));
-    fragmentList.add(new Pair<>(BorrowedFragment.class, null));
-    fragmentList.add(new Pair<>(SearchFragment.class, null));
-    fragmentList.add(new Pair<>(MapFragment.class, null));
-    fragmentList.add(new Pair<>(SettingsFragment.class, null));
+    pagerAdapter = new PagerAdapter(getSupportFragmentManager(), getLifecycle());
+    pagerAdapter.addFragment(new Pair<Class<? extends Fragment>,Bundle>(OwnedFragment.class, null));
+    pagerAdapter.addFragment(new Pair<Class<? extends Fragment>,Bundle>(BorrowedFragment.class, null));
+    pagerAdapter.addFragment(new Pair<Class<? extends Fragment>,Bundle>(SearchFragment.class, null));
+    pagerAdapter.addFragment(new Pair<Class<? extends Fragment>,Bundle>(MapFragment.class, null));
+    pagerAdapter.addFragment(new Pair<Class<? extends Fragment>,Bundle>(SettingsFragment.class, null));
 
     // configure viewpager2 and initialize page adapter
     viewPager2.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
     viewPager2.setOffscreenPageLimit(tabLayout.getTabCount());
     viewPager2.setUserInputEnabled(false);
-    pagerAdapter = new PagerAdapter(getSupportFragmentManager(), getLifecycle(), fragmentList);
     viewPager2.setAdapter(pagerAdapter);
 
     tabLayout.addOnTabSelectedListener(new OnTabSelectedListener() {
