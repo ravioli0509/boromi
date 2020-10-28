@@ -1,6 +1,7 @@
 package com.team41.boromi.adapters;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -28,7 +29,8 @@ public class PagerAdapter extends FragmentStateAdapter {
       return FragmentFactory.createFragment(p.first, p.second);
     } catch (InstantiationException | IllegalAccessException e) {
       e.printStackTrace();
-      throw new RuntimeException("Failed to create fragment");
+      Log.w("PagerAdapter", e);
+      throw new RuntimeException("Failed to create fragment " + e.toString());
     }
   }
 
