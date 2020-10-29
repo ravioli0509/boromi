@@ -12,10 +12,8 @@ import java.util.UUID;
  */
 public class Book implements Serializable {
 
-  @NonNull
-  private final UUID bookId;
-  @NonNull
-  private final String owner;
+  private String bookId;
+  private String owner;
   private String ISBN;
   private String author;
   private String desc;
@@ -30,19 +28,24 @@ public class Book implements Serializable {
   // And wipe them on each acceptance.
 
   /**
+   * A no-argument constructor required by firestore to serialize data
+   */
+  public Book() {}
+
+  /**
    * When UUID not specified, we generate a random UUID to identify the book
    *
    * @param owner
    */
   public Book(String owner) {
-    this.bookId = UUID.randomUUID();
+    this.bookId = UUID.randomUUID().toString();
     this.owner = owner;
     this.status = BookStatus.AVAILABLE;
     this.workflow = BookWorkflowStage.AVAILABLE;
   }
 
-  public Book(String owner, UUID uuid) {
-    this.bookId = uuid;
+  public Book(String owner, String bookId) {
+    this.bookId = bookId;
     this.owner = owner;
     this.status = BookStatus.AVAILABLE;
     this.workflow = BookWorkflowStage.AVAILABLE;
@@ -50,7 +53,7 @@ public class Book implements Serializable {
 
   // Setters / Getters Start
   @NonNull
-  public UUID getBookId() {
+  public String getBookId() {
     return bookId;
   }
 
