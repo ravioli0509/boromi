@@ -2,10 +2,12 @@ package com.team41.boromi.models;
 
 import androidx.annotation.NonNull;
 
+import java.io.Serializable;
+
 /**
  * A user class. Each user class must have a username assigned
  */
-public class User implements OwnerInterface, BorrowerInterface {
+public class User implements OwnerInterface, BorrowerInterface, Serializable {
 
   @NonNull
   private final String username;
