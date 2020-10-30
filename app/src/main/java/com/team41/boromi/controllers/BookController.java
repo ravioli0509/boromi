@@ -14,10 +14,13 @@ import com.team41.boromi.constants.CommonConstants.BookWorkflowStage;
 import com.team41.boromi.models.Book;
 import com.team41.boromi.dbs.BookDB;
 import static com.team41.boromi.constants.CommonConstants.BookStatus;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
-import java.lang.reflect.Array;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
@@ -25,34 +28,44 @@ import javax.inject.Inject;
 public class BookController {
 
     private final static String TAG = "BookController";
-    final Executor executor;
-    BookDB bookDB;
+    ExecutorService executeService = newSingleThreadExecutor();
+    protected BookStatus status;
+    protected BookWorkflowStage workflow;
+    protected BookCallback bookCallback;
+    protected Executor executor;
     FirebaseFirestore db;
+    BookDB bookDB;
 
     @Inject
-    public BookController(BookDB bookDB, Executor executor, FirebaseFirestore db){
+    public BookController(BookDB bookDB, ExecutorService excuteService, FirebaseFirestore db){
         this.bookDB = bookDB;
-        this.executor = executor;
+        this.executeService = excuteService;
         this.db = db;
     }
 
     /**
      * Filters an array of Books into Available books
      *
-     * @param books
-     * @param bookStatus
+     * @param username
      * @return a list of books that are filtered by available books
      */
-    public ArrayList<Book> filterBookByStatus(ArrayList<Book> books, BookStatus bookStatus, String username){
-        ArrayList<Book> ownedBooks = new ArrayList<>();
+    public ArrayList<Book> filterBookByAvailable(String username){
+        ArrayList<Book> filteredBooks = new ArrayList<>();
         if (isNotNullOrEmpty(username)) {
-            executor.execute(() -> {
+            executeService.execute(() -> {
+                ArrayList<Book> userOwnedBooks = bookDB.getUsersOwnedBooks(username);
+                for (Book eachBook : userOwnedBooks){
+                    if (status.AVAILABLE == eachBook.getStatus()){
+                        filteredBooks.add(eachBook);
+                    };
+                }
             });
+            executeService.shutdown();
         } else {
-            throw new IllegalArgumentException("Username is either null or empty");
+            Log.d(TAG, " Error in one of the columns");
+            bookCallback.onFailure("Error in one of the columns");
         }
-        final ArrayList<Book> userOwnedBooks = bookDB.getUsersOwnedBooks(username);
-        return ownedBooks;
+        return filteredBooks;
     }
 
     public static boolean isNotNullOrEmpty(String str) {
@@ -67,38 +80,40 @@ public class BookController {
      * @param owner
      * @param author
      * @param ISBN
-     * @param Desc
-     * @param status
-     * @param workflowStage
+     * @param title
      */
-    public void addBook(String owner, String author, String ISBN, String Desc, BookStatus status, BookWorkflowStage workflowStage,
-                        final BookCallback bookCallback) {
-        Book addingBook = new Book(owner);
-        if( isNotNullOrEmpty(author) || isNotNullOrEmpty(ISBN) || isNotNullOrEmpty(Desc)) {
-            addingBook.setAuthor(author);
-            addingBook.setISBN(ISBN);
-            addingBook.setDesc(Desc);
+    public Boolean addBook(String owner, String author, String ISBN, String title) {
+        if(isNotNullOrEmpty(author) && isNotNullOrEmpty(ISBN) && isNotNullOrEmpty(title)) {
+            Book addingBook = new Book(owner, title, author, ISBN);
             addingBook.setStatus(status.AVAILABLE);
-            addingBook.setWorkflow(workflowStage.AVAILABLE);
-            executor.execute(() -> {
-               Book result = bookDB.pushBook(addingBook);
-               if (result != null) {
-                   Log.d(TAG, " book add success");
-                   bookCallback.onSuccess("Book Add Success");
-               } else {
-                   Log.d(TAG, " book add error");
-                   bookCallback.onSuccess("Book Add Error");
-               }
+            addingBook.setWorkflow(workflow.AVAILABLE);
+            executeService.execute(() -> {
+                Book result = bookDB.pushBook(addingBook);
+                if (result != null) {
+                    Log.d(TAG, " book add success");
+                    System.out.println("TEST!");
+                    System.out.println(result);
+//                    bookCallback.onSuccess("Book Add Success");
+                } else {
+                    Log.d(TAG, " book add error");
+//                    bookCallback.onFailure("Book Add Error");
+                }
             });
+
+            executeService.shutdown();
+            return true;
         } else {
-            throw new IllegalArgumentException("Error in one of the columns");
+            Log.d(TAG, " Error in one of the columns");
+            bookCallback.onFailure("Error in one of the columns");
+            return false;
         }
     }
 
-    public AtomicReference<ArrayList<Book>> getOwnedBooks(String username, final BookCallback bookCallback){
+
+    public AtomicReference<ArrayList<Book>> getOwnedBooks(String username){
         AtomicReference<ArrayList<Book>> ownedBooks = new AtomicReference<>(new ArrayList<Book>());
         if (isNotNullOrEmpty(username)) {
-            executor.execute(() -> {
+            executeService.execute(() -> {
                 ownedBooks.set(bookDB.getUsersOwnedBooks(username));
                 if (ownedBooks.get() != null) {
                     Log.d(TAG, " get books success");
@@ -108,13 +123,16 @@ public class BookController {
                     bookCallback.onFailure("Get Books Error");
                 }
             });
+            executeService.shutdown();
+        } else {
+            Log.d(TAG, " Error in one of the columns");
+            bookCallback.onFailure("Error in one of the columns");
         }
         return ownedBooks;
     }
 
-    public void editBook(String bookID, String author, String ISBN, String desc, BookStatus status, BookWorkflowStage workflowStage,
-                         final BookCallback bookCallback){
-        if( isNotNullOrEmpty(author) || isNotNullOrEmpty(ISBN) || isNotNullOrEmpty(desc)) {
+    public boolean editBook(String bookID, String author, String ISBN, String title, BookStatus bookStatus, BookWorkflowStage workflowStage){
+        if( isNotNullOrEmpty(author) || isNotNullOrEmpty(ISBN) || isNotNullOrEmpty(title)) {
             db.collection("books")
                 .document(bookID)
                 .get()
@@ -125,28 +143,29 @@ public class BookController {
                             Log.d(TAG, "get book worked");
                             DocumentSnapshot document = task.getResult();
                             Book editingBook = document.toObject(Book.class);
-                            editingBook.setDesc(desc);
+                            editingBook.setTitle(title);
                             editingBook.setISBN(ISBN);
                             editingBook.setAuthor(author);
                             editingBook.setWorkflow(workflowStage);
-                            editingBook.setStatus(status);
+                            editingBook.setStatus(bookStatus);
                             Book result = bookDB.pushBook(editingBook);
                             bookCallback.onSuccess(task.getResult().toString());
-
                         } else {
                             Log.d(TAG, "get book error");
                             bookCallback.onFailure(task.getException().toString());
                         }
                     }
                 });
+            return true;
         } else {
-            throw new IllegalArgumentException("Error in one of the columns");
+            Log.d(TAG, " Error in one of the columns");
+            return false;
         }
     }
 
-    public void deleteBook(String bookID, final BookCallback bookCallback) {
+    public boolean deleteBook(String bookID) {
         if (isNotNullOrEmpty(bookID)) {
-            executor.execute(() -> {
+            executeService.execute(() -> {
                 Boolean result = bookDB.deleteBook(bookID);
                 if (result) {
                     Log.d(TAG, " book delete success");
@@ -156,20 +175,26 @@ public class BookController {
                     bookCallback.onFailure("Book delete error");
                 }
             });
+            executeService.shutdown();
+            return true;
         } else {
-            throw new IllegalArgumentException("Book ID is null or empty");
+            Log.d(TAG, " Error in one of the columns");
+            bookCallback.onFailure("Error in one of the columns");
+            return false;
         }
     }
 
-
-    public void findBooks(String keywords) {
+    public AtomicReference<ArrayList<Book>> findBooks(String keywords) {
+        AtomicReference<ArrayList<Book>> searchedBooks = new AtomicReference<>(new ArrayList<Book>());
         if (isNotNullOrEmpty(keywords)) {
-            executor.execute(() -> {
-                bookDB.findBooks(keywords);
+            executeService.execute(() -> {
+               searchedBooks.set(bookDB.findBooks(keywords));
             });
+            executeService.shutdown();
         } else {
-            throw new IllegalArgumentException("Keywords missing");
+            bookCallback.onFailure("Keyword missing");
         }
+        return searchedBooks;
     }
 
 }

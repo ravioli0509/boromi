@@ -19,6 +19,7 @@ import com.team41.boromi.controllers.AuthenticationController_Factory;
 import com.team41.boromi.models.Book;
 import com.team41.boromi.models.User;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -97,13 +98,16 @@ public class BookDB {
 	 * @return Null if the push fails, otherwise returns the book object
 	 */
 	public Book pushBook(Book book) {
+		System.out.println("BOOK DB");
+//		System.out.println(bookRef);
 		gson.toJson(book);
 
 		try {
 			Tasks.await(
-					booksRef.document(book.getBookId().toString()).set(book),
+					booksRef.document(book.getBookId()).set(book),
 					DB_TIMEOUT,
 					TimeUnit.MILLISECONDS);
+			System.out.println("TEEEEESSST"+ book.toString());
 			return book;
 		} catch (Exception e) {
 			Log.w(TAG, e.getCause());
@@ -112,11 +116,30 @@ public class BookDB {
 	}
 
 	/**
-	 *
+	 * Searches book by querying keywords
 	 * @param keywords
 	 * @return
 	 */
-	public void findBooks(String keywords) {}
+	public ArrayList<Book> findBooks(String keywords) {
+		final ArrayList<Book> foundBooks = new ArrayList<>();
+
+		QuerySnapshot res;
+
+		try {
+			res = Tasks.await(
+					booksRef.startAt(keywords).endAt(keywords+"\uf8ff").get(),
+					DB_TIMEOUT,
+					TimeUnit.MILLISECONDS);
+		} catch (Exception e) {
+			Log.w(TAG, e.getCause());
+			return null;
+		}
+
+		for (DocumentSnapshot document : res.getDocuments())
+			foundBooks.add(document.toObject(Book.class));
+
+		return foundBooks;
+	}
 
 
 	// TODO:
