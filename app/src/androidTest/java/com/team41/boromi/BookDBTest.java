@@ -27,7 +27,6 @@ public class BookDBTest {
 		// This assumes correct functionality of the pushBook method but
 		// I didn't know a better way to automate the process of setting up
 		// A consistent testing environment
-
 		testBooks.add(bookDB.pushBook(new Book(
 				"testuser1",
 				"The Hobbit",
