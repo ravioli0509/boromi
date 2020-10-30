@@ -15,6 +15,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
+import com.team41.boromi.controllers.AuthenticationController_Factory;
 import com.team41.boromi.models.Book;
 import com.team41.boromi.models.User;
 
@@ -53,7 +54,7 @@ public class BookDB {
 
 		QuerySnapshot res;
 
-		// Gets all books with the owner field equal to thee uuid
+		// Gets all books with the owner field equal to the uuid
 		try {
 			res = Tasks.await(
 					booksRef.whereEqualTo("owner", username).get(),
@@ -109,6 +110,14 @@ public class BookDB {
 			return null;
 		}
 	}
+
+	/**
+	 *
+	 * @param keywords
+	 * @return
+	 */
+	public void findBooks(String keywords) {}
+
 
 	// TODO:
 	// Add a method to query for all the books a user has
