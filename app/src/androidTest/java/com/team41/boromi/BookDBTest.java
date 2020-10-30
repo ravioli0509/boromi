@@ -41,7 +41,6 @@ public class BookDBTest {
 		// This assumes correct functionality of the deleteBook method but
 		// I didn't know a better way to automate the process of setting up
 		// A consistent testing environment
-
 		for (Book book : testBooks)
 			bookDB.deleteBook(book.getBookId());
 
