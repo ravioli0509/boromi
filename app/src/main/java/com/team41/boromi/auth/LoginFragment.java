@@ -2,21 +2,16 @@ package com.team41.boromi.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import android.view.View.OnClickListener;
-import android.widget.TextView;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
+import android.widget.TextView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import com.team41.boromi.BookActivity;
 import com.team41.boromi.R;
-import org.w3c.dom.Text;
 
 /**
  * A simple {@link Fragment} subclass. Use the {@link LoginFragment#newInstance} factory method to
