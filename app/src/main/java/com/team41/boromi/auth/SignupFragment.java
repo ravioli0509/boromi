@@ -62,7 +62,7 @@ public class SignupFragment extends Fragment {
     activity = (MainActivity) getActivity();
     spinner = view.findViewById(R.id.signup_loading);
     spinner.setVisibility(View.GONE);
-    Button createAccountButton = (Button) view.findViewById(R.id.signup_signup);
+    Button createAccountButton = view.findViewById(R.id.signup_signup);
     fullNameInput = view.findViewById(R.id.signup_name);
     emailInput = view.findViewById(R.id.signup_email);
     userNameInput = view.findViewById(R.id.signup_username);
