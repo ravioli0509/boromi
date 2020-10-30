@@ -3,8 +3,12 @@ package com.team41.boromi;
 import android.os.Bundle;
 
 import android.util.Pair;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -33,6 +37,9 @@ public class BookActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_book);
+
+    Toolbar toolbar = (Toolbar) findViewById(R.id.book_toolbar);
+    setSupportActionBar(toolbar);
 
     tabLayout = findViewById(R.id.tabs_main);
     viewPager2 = findViewById(R.id.view_pager_main);
@@ -72,5 +79,25 @@ public class BookActivity extends AppCompatActivity {
 
       }
     });
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.toolbar_add:
+        // TODO add toolbar add logic
+        return true;
+      case R.id.toolbar_scan:
+        // TODO add toolbar scan logic
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
+    }
   }
 }
