@@ -22,7 +22,9 @@ import com.team41.boromi.models.User;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -98,8 +100,6 @@ public class BookDB {
 	 * @return Null if the push fails, otherwise returns the book object
 	 */
 	public Book pushBook(Book book) {
-		System.out.println("BOOK DB");
-//		System.out.println(bookRef);
 		gson.toJson(book);
 
 		try {
@@ -107,7 +107,6 @@ public class BookDB {
 					booksRef.document(book.getBookId()).set(book),
 					DB_TIMEOUT,
 					TimeUnit.MILLISECONDS);
-			System.out.println("TEEEEESSST"+ book.toString());
 			return book;
 		} catch (Exception e) {
 			Log.w(TAG, e.getCause());
@@ -139,6 +138,54 @@ public class BookDB {
 			foundBooks.add(document.toObject(Book.class));
 
 		return foundBooks;
+	}
+
+	/**
+	 * Get Book using BookID
+	 * @param bookID
+	 * @return book
+	 */
+	public Book getBook(String bookID) {
+		Book getBook;
+
+		DocumentSnapshot res;
+
+		try {
+			res = Tasks.await(
+					booksRef.document(bookID).get(),
+					DB_TIMEOUT,
+					TimeUnit.MILLISECONDS);
+		} catch (Exception e) {
+			Log.w(TAG, e.getCause());
+			return null;
+		}
+
+		getBook = res.toObject(Book.class);
+
+		return getBook;
+	}
+
+	public ArrayList<Book> getAllBooks(){
+		ArrayList<Book> bookList = new ArrayList<>();
+
+		QuerySnapshot res;
+
+		try {
+			res = Tasks.await(
+					booksRef.get(),
+					DB_TIMEOUT,
+					TimeUnit.MILLISECONDS
+			);
+
+		} catch (Exception e){
+			Log.w(TAG, e.getCause());
+			return null;
+		}
+
+		for (DocumentSnapshot document : res.getDocuments())
+			bookList.add(document.toObject(Book.class));
+
+		return bookList;
 	}
 
 
