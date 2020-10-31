@@ -165,6 +165,11 @@ public class BookDB {
 		return getBook;
 	}
 
+
+	/**
+	 * gets all books from the DB
+	 * @return
+	 */
 	public ArrayList<Book> getAllBooks(){
 		ArrayList<Book> bookList = new ArrayList<>();
 

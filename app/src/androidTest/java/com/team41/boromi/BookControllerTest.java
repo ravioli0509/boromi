@@ -14,7 +14,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import com.team41.boromi.callbacks.BookCallback;
 
 import com.team41.boromi.constants.CommonConstants.BookWorkflowStage;
 import com.team41.boromi.constants.CommonConstants.BookStatus;
@@ -26,10 +25,8 @@ import static org.junit.Assert.assertTrue;
 public class BookControllerTest {
     protected BookStatus status;
     protected BookWorkflowStage workflow;
-    protected BookCallback bookCallback;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     BookDB bookDB = new BookDB(db);
-//    ExecutorService executeService = Executors.newSingleThreadExecutor();
     ExecutorService executorService = new ThreadPoolExecutor(1, 4, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>() );
     BookController bookController = new BookController(bookDB, executorService, db);
     ArrayList<Book> testBooks = new ArrayList<>();
