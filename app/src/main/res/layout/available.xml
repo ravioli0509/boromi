@@ -26,7 +26,7 @@
             android:paddingHorizontal="5dp">
 
             <ImageButton
-                android:id="@+id/bookImage"
+                android:id="@+id/book_image"
                 android:layout_width="42dp"
                 android:layout_height="38dp"
                 android:layout_marginStart="5dp"
@@ -46,7 +46,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/Title"
+                android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="The Hobbit"
@@ -54,7 +54,7 @@
                 android:textSize="20sp"></TextView>
 
             <TextView
-                android:id="@+id/Author"
+                android:id="@+id/author"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="J.R.R. Tolkein"
@@ -62,7 +62,7 @@
                 android:textSize="12sp"></TextView>
 
             <TextView
-                android:id="@+id/ISBN"
+                android:id="@+id/isbn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="ISBN: #1234567890123"
@@ -77,7 +77,7 @@
             android:paddingRight="5dp">
 
             <ImageButton
-                android:id="@+id/rightButton"
+                android:id="@+id/right_button"
                 android:layout_width="31dp"
                 android:layout_height="29dp"
                 android:layout_marginStart="5dp"
