@@ -10,17 +10,8 @@ import java.util.ArrayList;
  */
 public interface BookCallback {
 
-    void onSuccessFilterBook(ArrayList<Book> availableBooks, ArrayList<Book> requestedBooks, ArrayList<Book> acceptedBook, ArrayList<Book> borrowedBooks);
+    void onSuccess(ArrayList<Book> books);
 
-    void onSuccessAddBook(String message);
+    void onFailure(Exception e);
 
-    void onSuccessEditBook(String message);
-
-    void onSuccessGetOwnedBooks(ArrayList<Book> ownedBooks);
-
-    void onSuccessDeleteBook(String message);
-
-    void onSuccessFindBooks(ArrayList<Book> foundBooks);
-
-    void onFailure(Exception exception);
 }

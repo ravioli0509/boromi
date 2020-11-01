@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
@@ -15,9 +14,8 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
-import com.team41.boromi.controllers.AuthenticationController_Factory;
+import com.team41.boromi.constants.CommonConstants;
 import com.team41.boromi.models.Book;
-import com.team41.boromi.models.User;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -30,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import static com.team41.boromi.constants.CommonConstants.DB_TIMEOUT;
+import com.team41.boromi.constants.CommonConstants.BookStatus;
 
 @Singleton
 public class BookDB {
@@ -38,6 +37,7 @@ public class BookDB {
 	private final String DB_COLLECTION = "books";
 	private final FirebaseFirestore db;
 	private final CollectionReference booksRef;
+	protected BookStatus status;
 
 	private final Gson gson = new Gson();
 
@@ -146,8 +146,6 @@ public class BookDB {
 	 * @return book
 	 */
 	public Book getBook(String bookID) {
-		Book getBook;
-
 		DocumentSnapshot res;
 
 		try {
@@ -160,7 +158,7 @@ public class BookDB {
 			return null;
 		}
 
-		getBook = res.toObject(Book.class);
+		Book getBook = res.toObject(Book.class);
 
 		return getBook;
 	}
@@ -191,6 +189,98 @@ public class BookDB {
 			bookList.add(document.toObject(Book.class));
 
 		return bookList;
+	}
+
+	public ArrayList<Book> getOwnerRequestedBooks(String owner) {
+		final ArrayList<Book> requestedBooks = new ArrayList<>();
+
+		QuerySnapshot res;
+
+		// Gets all books with the owner field equal to the uuid
+		try {
+			res = Tasks.await(
+					booksRef.whereEqualTo("owner", owner).whereEqualTo("status", status.REQUESTED).get(),
+					DB_TIMEOUT,
+					TimeUnit.MILLISECONDS
+			);
+		} catch (Exception e) { // failed
+			Log.w(TAG, e.getCause());
+			return null;
+		}
+
+		for (DocumentSnapshot document : res.getDocuments())
+			requestedBooks.add(document.toObject(Book.class));
+
+		return requestedBooks;
+	}
+
+	public ArrayList<Book> getOwnerBorrowedBooks(String owner) {
+		final ArrayList<Book> borrowedBooks = new ArrayList<>();
+
+		QuerySnapshot res;
+
+		// Gets all books with the owner field equal to the uuid
+		try {
+			res = Tasks.await(
+					booksRef.whereEqualTo("owner", owner).whereEqualTo("status", status.BORROWED).get(),
+					DB_TIMEOUT,
+					TimeUnit.MILLISECONDS
+			);
+		} catch (Exception e) { // failed
+			Log.w(TAG, e.getCause());
+			return null;
+		}
+
+		for (DocumentSnapshot document : res.getDocuments())
+			borrowedBooks.add(document.toObject(Book.class));
+
+		return borrowedBooks;
+	}
+
+	public ArrayList<Book> getOwnerAcceptedBooks(String owner) {
+		final ArrayList<Book> acceptedBooks = new ArrayList<>();
+
+		QuerySnapshot res;
+
+		// Gets all books with the owner field equal to the uuid
+		try {
+			res = Tasks.await(
+					booksRef.whereEqualTo("owner", owner).whereEqualTo("status", status.ACCEPTED).get(),
+					DB_TIMEOUT,
+					TimeUnit.MILLISECONDS
+			);
+		} catch (Exception e) { // failed
+			Log.w(TAG, e.getCause());
+			return null;
+		}
+
+		for (DocumentSnapshot document : res.getDocuments())
+			acceptedBooks.add(document.toObject(Book.class));
+
+		return acceptedBooks;
+	}
+
+	public ArrayList<Book> getOwnerAvailableBooks(String owner) {
+		final ArrayList<Book> availableBooks = new ArrayList<>();
+
+		QuerySnapshot res;
+
+		// Gets all books with the owner field equal to the uuid
+		try {
+			res = Tasks.await(
+					booksRef.whereEqualTo("owner", owner).whereEqualTo("status", status.AVAILABLE).get(),
+					DB_TIMEOUT,
+					TimeUnit.MILLISECONDS
+			);
+		} catch (Exception e) { // failed
+			Log.w(TAG, e.getCause());
+			return null;
+		}
+
+		for (DocumentSnapshot document : res.getDocuments())
+			availableBooks.add(document.toObject(Book.class));
+
+		return availableBooks;
 	}
 
 

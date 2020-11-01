@@ -10,6 +10,8 @@ import com.team41.boromi.constants.CommonConstants.BookWorkflowStage;
 import com.team41.boromi.models.Book;
 import com.team41.boromi.dbs.BookDB;
 import static com.team41.boromi.constants.CommonConstants.BookStatus;
+import static com.team41.boromi.utility.Utility.isNotNullOrEmpty;
+
 import org.apache.commons.lang3.StringUtils; // For case sensitive keyword search
 
 import java.util.ArrayList;
@@ -17,12 +19,13 @@ import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
 
-public class BookController implements BookCallback{
+public class BookController {
 
     private final static String TAG = "BookController";
     protected BookStatus status;
     protected BookWorkflowStage workflow;
     protected Executor executor;
+
     FirebaseFirestore db;
     BookDB bookDB;
 
@@ -34,68 +37,13 @@ public class BookController implements BookCallback{
     }
 
     /**
-     * Filter books using their book status, and separate them into 4 array lists
-     *
-     * @param owner
-     * @return a list of books that are filtered by available books
-     */
-    public void filterBookByStatus(String owner){
-        ArrayList<Book> availableBooks = new ArrayList<>();
-        ArrayList<Book> requestedBooks = new ArrayList<>();
-        ArrayList<Book> acceptedBooks = new ArrayList<>();
-        ArrayList<Book> borrowedBooks = new ArrayList<>();
-        if (isNotNullOrEmpty(owner)) {
-            executor.execute(() -> {
-                ArrayList<Book> userOwnedBooks = bookDB.getUsersOwnedBooks(owner);
-                if (userOwnedBooks != null) {
-                    for (Book eachBook : userOwnedBooks){
-                        BookStatus thisStatus = eachBook.getStatus();
-                        if (status.AVAILABLE == thisStatus){
-                            availableBooks.add(eachBook);
-                        } else if (status.REQUESTED == thisStatus) {
-                            requestedBooks.add(eachBook);
-                        } else if (status.ACCEPTED == thisStatus) {
-                            acceptedBooks.add(eachBook);
-                        } else if (status.BORROWED == thisStatus) {
-                            borrowedBooks.add(eachBook);
-                        } else {
-                            Log.d(TAG, "Status is null");
-                            onFailure(new IllegalArgumentException());
-                        }
-                    }
-                    Log.d(TAG, "Call backing All Filtered Books");
-                    onSuccessFilterBook(availableBooks, requestedBooks, acceptedBooks, borrowedBooks);
-                } else {
-                    Log.d(TAG, "Book empty");
-                    onFailure(new IllegalArgumentException());
-                }
-            });
-        } else {
-            Log.d(TAG, " Error in one of the columns");
-            onFailure(new IllegalArgumentException());
-        }
-    }
-
-    /**
-     * static method to check null/empty
-     * @param str
-     * @return
-     */
-    public static boolean isNotNullOrEmpty(String str) {
-        if (!str.trim().isEmpty() && str != null) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Adds Book to DB asynchronously. On Success or Failure, it will have a callback to let the ui know
      * @param owner
      * @param author
      * @param ISBN
      * @param title
      */
-    public Boolean addBook(String owner, String author, String ISBN, String title) {
+    public void addBook(String owner, String author, String ISBN, String title, final BookCallback bookCallback) {
         if(isNotNullOrEmpty(author) && isNotNullOrEmpty(ISBN) && isNotNullOrEmpty(title)) {
             Book addingBook = new Book(owner, title, author, ISBN);
             addingBook.setStatus(status.AVAILABLE);
@@ -104,17 +52,15 @@ public class BookController implements BookCallback{
                 Book result = bookDB.pushBook(addingBook);
                 if (result != null) {
 //                    Log.d(TAG, " book add success");
-                    onSuccessAddBook("Book Add Success");
+                    bookCallback.onSuccess(null);
                 } else {
                     Log.d(TAG, " book add error");
-                    onFailure(new IllegalArgumentException());
+                    bookCallback.onFailure(new IllegalArgumentException());
                 }
             });
-            return true;
         } else {
             Log.d(TAG, " Error in one of the columns");
-            onFailure(new IllegalArgumentException());
-            return false;
+            bookCallback.onFailure(new IllegalArgumentException());
         }
     }
 
@@ -126,7 +72,7 @@ public class BookController implements BookCallback{
      * @param title
      * @return
      */
-    public Boolean editBook(String bookID, String author, String ISBN, String title){
+    public void editBook(String bookID, String author, String ISBN, String title, final BookCallback bookCallback){
         if (isNotNullOrEmpty(author) && isNotNullOrEmpty(ISBN) && isNotNullOrEmpty(title)) {
             executor.execute(() -> {
                 Book editingBook = bookDB.getBook(bookID);
@@ -136,62 +82,57 @@ public class BookController implements BookCallback{
                     editingBook.setISBN(ISBN);
                     bookDB.pushBook(editingBook);
                     Log.d(TAG, " book add success");
-                    onSuccessEditBook("Successful edit");
+                    bookCallback.onSuccess(null);
                 } else {
                     Log.d(TAG, " book add error");
-                    onFailure(new IllegalArgumentException());
+                    bookCallback.onFailure(new IllegalArgumentException());
                 }
             });
-            return true;
         }
-        return false;
     }
 
     /**
      * Get Owner's Books
      * @param owner
      */
-    public boolean getOwnedBooks(String owner){
+    public void getOwnedBooks(String owner, final BookCallback bookCallback){
         if (isNotNullOrEmpty(owner)) {
             executor.execute(() -> {
                 ArrayList<Book> ownedBooks = bookDB.getUsersOwnedBooks(owner);
                 if (ownedBooks != null) {
                     Log.d(TAG, " get books success");
-                    onSuccessGetOwnedBooks(ownedBooks);
+                    bookCallback.onSuccess(ownedBooks);
                 } else {
                     Log.d(TAG, " get books error");
-                    onFailure(new IllegalArgumentException());
+                    bookCallback.onFailure(new IllegalArgumentException());
                 }
             });
-            return true;
         } else {
             Log.d(TAG, " Error in one of the columns");
-            onFailure(new IllegalArgumentException());
-            return false;
+            bookCallback.onFailure(new IllegalArgumentException());
         }
     }
 
     /**
      * Deletes book using bookID
      * @param bookID
+     * @return
      */
-    public boolean deleteBook(String bookID) {
+    public void deleteBook(String bookID, final BookCallback bookCallback) {
         if (isNotNullOrEmpty(bookID)) {
             executor.execute(() -> {
                 Boolean result = bookDB.deleteBook(bookID);
                 if (result) {
                     Log.d(TAG, " book delete success");
-                    onSuccessDeleteBook("Book delete Success");
+                    bookCallback.onSuccess(null);
                 } else {
                     Log.d(TAG, " book delete error");
-                    onFailure(new IllegalArgumentException());
+                    bookCallback.onFailure(new IllegalArgumentException());
                 }
             });
-            return true;
         } else {
             Log.d(TAG, " Error in one of the columns");
-            onFailure(new IllegalArgumentException());
-            return false;
+            bookCallback.onFailure(new IllegalArgumentException());
         }
     }
 
@@ -200,7 +141,7 @@ public class BookController implements BookCallback{
      * @param keywords
      * @return
      */
-    public ArrayList<Book> findBooks(String keywords) {
+    public ArrayList<Book> findBooks(String keywords, final BookCallback bookCallback) {
         ArrayList<Book> searchedBooks = new ArrayList<Book>();
         if (isNotNullOrEmpty(keywords)) {
             executor.execute(() -> {
@@ -212,54 +153,110 @@ public class BookController implements BookCallback{
                            searchedBooks.add(eachBook);
                        }
                    }
-                   onSuccessFindBooks(searchedBooks);
+                   bookCallback.onSuccess(searchedBooks);
+                   Log.d(TAG, " Success");
                } else {
                    Log.d(TAG, " Error in one of the columns");
-                   onFailure(new IllegalArgumentException());
+                   bookCallback.onFailure(new IllegalArgumentException());
                }
             });
         } else {
             Log.d(TAG, "Keyword is empty or null");
-            onFailure(new IllegalArgumentException());
+            bookCallback.onFailure(new IllegalArgumentException());
         }
         return searchedBooks;
     }
 
-    @Override
-    public void onSuccessFilterBook(ArrayList<Book> availableBooks, ArrayList<Book> requestedBooks, ArrayList<Book> acceptedBook, ArrayList<Book> borrowedBooks) {
-        Log.d(TAG, availableBooks.toString());
-        Log.d(TAG, requestedBooks.toString());
-        Log.d(TAG, acceptedBook.toString());
-        Log.d(TAG, borrowedBooks.toString());
+    /**
+     * Gets all the owner books that are requested
+     * @param owner
+     * @return
+     */
+    public void getOwnerRequestedBooks(String owner, final BookCallback bookCallback){
+        if (isNotNullOrEmpty(owner)) {
+            executor.execute(() -> {
+                ArrayList<Book> requestedBooks = bookDB.getOwnerRequestedBooks(owner);
+                if (requestedBooks != null) {
+                    Log.d(TAG, " get books success");
+                    bookCallback.onSuccess(requestedBooks);
+                } else {
+                    Log.d(TAG, " get books error");
+                    bookCallback.onFailure(new IllegalArgumentException());
+                }
+            });
+        } else {
+            Log.d(TAG, " Error in one of the columns");
+            bookCallback.onFailure(new IllegalArgumentException());
+        }
     }
 
-    @Override
-    public void onSuccessAddBook(String message) {
-        Log.d(TAG, message);
+    /**
+     * Gets all the owner books that are borrowed
+     * @param owner
+     * @return
+     */
+    public void getOwnerBorrowedBooks(String owner, final BookCallback bookCallback){
+        if (isNotNullOrEmpty(owner)) {
+            executor.execute(() -> {
+                ArrayList<Book> borrowedBooks = bookDB.getOwnerBorrowedBooks(owner);
+                if (borrowedBooks != null) {
+                    Log.d(TAG, " get books success");
+                    bookCallback.onSuccess(borrowedBooks);
+                } else {
+                    Log.d(TAG, " get books error");
+                    bookCallback.onFailure(new IllegalArgumentException());
+                }
+            });
+        } else {
+            Log.d(TAG, " Error in one of the columns");
+            bookCallback.onFailure(new IllegalArgumentException());
+        }
     }
 
-    @Override
-    public void onSuccessEditBook(String message) {
-        Log.d(TAG, message);
+    /**
+     * Gets all the owner books that are accepted
+     * @param owner
+     * @return
+     */
+    public void getOwnerAcceptedBooks(String owner, final BookCallback bookCallback){
+        if (isNotNullOrEmpty(owner)) {
+            executor.execute(() -> {
+                ArrayList<Book> acceptedBooks = bookDB.getOwnerAcceptedBooks(owner);
+                if (acceptedBooks != null) {
+                    Log.d(TAG, " get books success");
+                    bookCallback.onSuccess(acceptedBooks);
+                } else {
+                    Log.d(TAG, " get books error");
+                    bookCallback.onFailure(new IllegalArgumentException());
+                }
+            });
+        } else {
+            Log.d(TAG, " Error in one of the columns");
+            bookCallback.onFailure(new IllegalArgumentException());
+        }
     }
 
-    @Override
-    public void onSuccessGetOwnedBooks(ArrayList<Book> ownedBooks) {
-        Log.d(TAG, ownedBooks.toString());
+    /**
+     * Gets all the owner books that are available
+     * @param owner
+     * @return
+     */
+    public void getOwnerAvailableBooks(String owner, final BookCallback bookCallback){
+        if (isNotNullOrEmpty(owner)) {
+            executor.execute(() -> {
+                ArrayList<Book> availableBooks = bookDB.getOwnerAvailableBooks(owner);
+                if (availableBooks != null) {
+                    Log.d(TAG, " get books success");
+                    bookCallback.onSuccess(availableBooks);
+                } else {
+                    Log.d(TAG, " get books error");
+                    bookCallback.onFailure(new IllegalArgumentException());
+                }
+            });
+        } else {
+            Log.d(TAG, " Error in one of the columns");
+            bookCallback.onFailure(new IllegalArgumentException());
+        }
     }
 
-    @Override
-    public void onSuccessDeleteBook(String message) {
-        Log.d(TAG, message);
-    }
-
-    @Override
-    public void onSuccessFindBooks(ArrayList<Book> foundBooks) {
-        Log.d(TAG, foundBooks.toString());
-    }
-
-    @Override
-    public void onFailure(Exception exception) {
-        Log.d(TAG, exception.toString());
-    }
 }
