@@ -100,13 +100,9 @@ public class BookDB {
 	 * @return Null if the push fails, otherwise returns the book object
 	 */
 	public Book pushBook(Book book) {
-		gson.toJson(book);
 
 		try {
-			Tasks.await(
-					booksRef.document(book.getBookId()).set(book),
-					DB_TIMEOUT,
-					TimeUnit.MILLISECONDS);
+			booksRef.document(book.getBookId()).set(book);
 			return book;
 		} catch (Exception e) {
 			Log.w(TAG, e.getCause());
