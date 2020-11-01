@@ -296,29 +296,28 @@ public class BookDB {
 		}
 	}
 
-	  /**
-	   * gets books by a request list
-	   *
-	   * @param BookRequestList
-	   * @return
-	   */
+	/**
+	* gets books by a request list
+	*
+	* @param BookRequestList
+	* @return
+	*/
 
-	  public Map<String, Book> getBooksByBookRequestList(List<BookRequest> BookRequestList) {
-		Map<String, Book> bookMap = new HashMap<>();
-		for (BookRequest br : BookRequestList) {
-		  if (bookMap.containsKey(br.getBookId()))
+	public Map<String, Book> getBooksByBookRequestList(List<BookRequest> BookRequestList) {
+	Map<String, Book> bookMap = new HashMap<>();
+	for (BookRequest br : BookRequestList) {
+		if (bookMap.containsKey(br.getBookId()))
 			continue;
-		  Book b = getBookById(br.getBookId());
-		  if (b == null) {
+			Book b = getBookById(br.getBookId());
+		if (b == null) {
 			Log.w(TAG, "book: " + b.getBookId() + " doesn't exists but it was requested");
 			continue;
-		  }
-		  bookMap.put(b.getBookId(), b);
 		}
+		bookMap.put(b.getBookId(), b);
+	}
 
-		return bookMap;
-	  }
-
+	return bookMap;
+	}
 
 	// TODO:
 	// Add a method to query for all the books a user has
