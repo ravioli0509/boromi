@@ -100,7 +100,8 @@ public class BookControllerTest {
 
     @Test
     public void testDelete() throws InterruptedException {
-        String bookID = "87c2be16-7f75-4052-b75c-9b2a8e01febe";
+        Book booktest = new Book("MingDelete", "Toy Story 3", "Ming", "123456789022");
+        String bookID = booktest.getBookId();
         bookController.deleteBook(bookID, new BookCallback() {
             @Override
             public void onSuccess(ArrayList<Book> books) {
@@ -115,6 +116,11 @@ public class BookControllerTest {
                 fail();
             }
         });
+        Thread.sleep(DB_TIMEOUT);
+
+
+        Book test = bookDB.getBookById(bookID);
+        assertNull(test);
         Thread.sleep(DB_TIMEOUT);
     }
 
