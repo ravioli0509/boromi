@@ -63,19 +63,19 @@ public class OwnedFragment extends Fragment {
     // add fragments to tabs
     pagerAdapter = new PagerAdapter(getChildFragmentManager(), getLifecycle());
     Bundle bundle = new Bundle();
-    bundle.putString("msg", "Available");
+    bundle.putString("msg", "These are all the books that you own that are available for other people to borrow");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
     bundle = new Bundle();
-    bundle.putString("msg", "Requests");
+    bundle.putString("msg", "These are all the books you own that other people have requested to borrow");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
     bundle = new Bundle();
-    bundle.putString("msg", "Accepted");
+    bundle.putString("msg", "These are all the book requests that you have accepted");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
     bundle = new Bundle();
-    bundle.putString("msg", "Lent");
+    bundle.putString("msg", "These are all your books that are being borrowed by other people");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
 

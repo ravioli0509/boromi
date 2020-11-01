@@ -61,15 +61,15 @@ public class BorrowedFragment extends Fragment {
     // add fragments to tabs
     pagerAdapter = new PagerAdapter(getChildFragmentManager(), getLifecycle());
     Bundle bundle = new Bundle();
-    bundle.putString("msg", "Borrowed");
+    bundle.putString("msg", "These are all the books that you have borrowed currently");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
     bundle = new Bundle();
-    bundle.putString("msg", "Requested");
+    bundle.putString("msg", "These are all the books that you have requested to borrow");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
     bundle = new Bundle();
-    bundle.putString("msg", "Accepted");
+    bundle.putString("msg", "These are all the books that you have been accepted to borrow");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
 
