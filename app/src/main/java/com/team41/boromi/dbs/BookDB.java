@@ -7,18 +7,18 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
 import com.team41.boromi.constants.CommonConstants;
 import com.team41.boromi.models.Book;
+import com.team41.boromi.models.BookRequest;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -282,6 +282,46 @@ public class BookDB {
 
 		return availableBooks;
 	}
+
+	public Book getBookById(String bid) {
+		DocumentSnapshot res;
+
+		try {
+		  res = Tasks.await(booksRef.document(bid).get(), DB_TIMEOUT, TimeUnit.MILLISECONDS);
+		} catch (Exception e) { // failed
+		  Log.w(TAG, e.getCause());
+		  return null;
+		}
+
+		if (res.exists()) {    // if user exists
+		  return res.toObject(Book.class);
+		} else {              // if user fails
+		  return null;
+		}
+	}
+
+	  /**
+	   * gets books by a request list
+	   *
+	   * @param BookRequestList
+	   * @return
+	   */
+
+	  public Map<String, Book> getBooksByBookRequestList(List<BookRequest> BookRequestList) {
+		Map<String, Book> bookMap = new HashMap<>();
+		for (BookRequest br : BookRequestList) {
+		  if (bookMap.containsKey(br.getBookId()))
+			continue;
+		  Book b = getBookById(br.getBookId());
+		  if (b == null) {
+			Log.w(TAG, "book: " + b.getBookId() + " doesn't exists but it was requested");
+			continue;
+		  }
+		  bookMap.put(b.getBookId(), b);
+		}
+
+		return bookMap;
+	  }
 
 
 	// TODO:
