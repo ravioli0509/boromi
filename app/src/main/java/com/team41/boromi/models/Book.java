@@ -78,12 +78,12 @@ public class Book implements Serializable {
    *
    * @param owner
    */
-  public Book(String owner) {
-    this.bookId = UUID.randomUUID().toString();
-    this.owner = owner;
-    this.status = BookStatus.AVAILABLE;
-    this.workflow = BookWorkflowStage.AVAILABLE;
-  }
+//  public Book(String owner) {
+//    this.bookId = UUID.randomUUID().toString();
+//    this.owner = owner;
+//    this.status = BookStatus.AVAILABLE;
+//    this.workflow = BookWorkflowStage.AVAILABLE;
+//  }
 
   public Book(String owner, String bookId) {
     this.bookId = bookId;
@@ -169,6 +169,11 @@ public class Book implements Serializable {
     return bookId;
   }
 
+  // THIS IS NOT GOOD PRACTICE BUT IT WILL FIX IT
+  public void setBookId(String bookId) {
+    this.bookId = bookId;
+  }
+
   public String getOwner() {
     return owner;
   }
@@ -240,13 +245,9 @@ public class Book implements Serializable {
   @Override
   public boolean equals(@Nullable Object obj) {
     if(obj instanceof String) {
-      if(bookId.compareTo((String) obj) == 0) {
-        return true;
-      }
+      return bookId.compareTo((String) obj) == 0;
     } else if (obj instanceof Book) {
-      if(bookId.compareTo(((Book) obj).getBookId()) == 0) {
-        return true;
-      }
+      return bookId.compareTo(((Book) obj).getBookId()) == 0;
     }
     return false;
   }

@@ -298,9 +298,11 @@ public class BookDB {
    */
   public Map<Book, List<BookRequest>> getBooksWithRequestList(List<BookRequest> BookRequestList) {
     Map<Book, List<BookRequest>> bookMap = new HashMap<>();
+    Book mockCompareBook = new Book();
     for (BookRequest br : BookRequestList) {
-      if (bookMap.containsKey(br.getBookId())) {
-        bookMap.get(br.getBookId()).add(br);
+    	mockCompareBook.setBookId(br.getBookId());
+			if (bookMap.containsKey(mockCompareBook)) {
+        bookMap.get(mockCompareBook).add(br);
         continue;
       }
 
@@ -311,9 +313,9 @@ public class BookDB {
       }
       bookMap.put(b, new ArrayList<>());
 			bookMap.get(b).add(br);
-    }
+		}
 
-	return bookMap;
+		return bookMap;
 	}
 
 	// TODO:
