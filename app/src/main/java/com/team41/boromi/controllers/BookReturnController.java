@@ -14,22 +14,21 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.Executor;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class BookReturnController {
 
   private final static String TAG = "ReturnController";
   final Executor executor;
   BookReturnDB returnDB;
   BookDB bookDB;
-  FirebaseAuth auth;
   User currentUser;
 
   @Inject
-  BookReturnController(BookReturnDB bookReturnDB, BookDB bookDB, FirebaseAuth auth,
-      Executor executor, User user) {
+  BookReturnController(BookReturnDB bookReturnDB, BookDB bookDB, Executor executor, User user) {
     this.executor = executor;
     this.bookDB = bookDB;
-    this.auth = auth;
     returnDB = bookReturnDB;
     currentUser = user;
   }
