@@ -1,14 +1,13 @@
 package com.team41.boromi;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -28,21 +27,17 @@ import com.team41.boromi.book.OwnedFragment;
 import com.team41.boromi.book.SearchFragment;
 import com.team41.boromi.book.SettingsFragment;
 import com.team41.boromi.callbacks.BookCallback;
-import com.team41.boromi.callbacks.ReturnCallback;
-import com.team41.boromi.constants.CommonConstants.BookWorkflowStage;
 import com.team41.boromi.controllers.BookController;
 import com.team41.boromi.controllers.BookRequestController;
 import com.team41.boromi.controllers.BookReturnController;
+import com.team41.boromi.models.Book;
 import com.team41.boromi.models.BookRequest;
 import com.team41.boromi.models.User;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
-import com.team41.boromi.models.Book;
-import java.util.ArrayList;
 
 public class BookActivity extends AppCompatActivity implements AddBookFragmentListener {
 
@@ -53,6 +48,7 @@ public class BookActivity extends AppCompatActivity implements AddBookFragmentLi
   private static final String TAG_PARAM5 = "TAG";
 
   private final String TAG = "BOOK ACTIVITY";
+  public Bitmap addedImage;
   @Inject
   BookReturnController bookReturnController;
   @Inject
@@ -61,15 +57,13 @@ public class BookActivity extends AppCompatActivity implements AddBookFragmentLi
   BookRequestController bookRequestController;
   @Inject
   User user;
-
   private ViewPager2 viewPager2;
   private PagerAdapter pagerAdapter;
   private TabLayout tabLayout;
-
   private Map<String, ArrayList<Book>> collections = new HashMap<>();
-
   private Map<Book, List<BookRequest>> requestsCollections = new HashMap<>();
   private MenuItem addButton;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -88,11 +82,15 @@ public class BookActivity extends AppCompatActivity implements AddBookFragmentLi
     TabItem tabSettings = findViewById(R.id.tab_settings);
 
     // Add fragments for each tab
-    pagerAdapter.addFragment(new Pair<Class<? extends Fragment>, Bundle>(OwnedFragment.class, null));
-    pagerAdapter.addFragment(new Pair<Class<? extends Fragment>, Bundle>(BorrowedFragment.class, null));
-    pagerAdapter.addFragment(new Pair<Class<? extends Fragment>, Bundle>(SearchFragment.class, null));
+    pagerAdapter
+        .addFragment(new Pair<Class<? extends Fragment>, Bundle>(OwnedFragment.class, null));
+    pagerAdapter
+        .addFragment(new Pair<Class<? extends Fragment>, Bundle>(BorrowedFragment.class, null));
+    pagerAdapter
+        .addFragment(new Pair<Class<? extends Fragment>, Bundle>(SearchFragment.class, null));
     pagerAdapter.addFragment(new Pair<Class<? extends Fragment>, Bundle>(MapFragment.class, null));
-    pagerAdapter.addFragment(new Pair<Class<? extends Fragment>, Bundle>(SettingsFragment.class, null));
+    pagerAdapter
+        .addFragment(new Pair<Class<? extends Fragment>, Bundle>(SettingsFragment.class, null));
 
     // configure viewpager2 and initialize page adapter
     viewPager2.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
@@ -116,6 +114,10 @@ public class BookActivity extends AppCompatActivity implements AddBookFragmentLi
       }
     });
 
+  }
+
+  public Bitmap getAddedImage() {
+    return addedImage;
   }
 
   @Override
@@ -142,7 +144,8 @@ public class BookActivity extends AppCompatActivity implements AddBookFragmentLi
   }
 
 
-  public Bundle setupBundle(int layout, ArrayList<Book> data, String messsge, String parent, String tag) {
+  public Bundle setupBundle(int layout, ArrayList<Book> data, String messsge, String parent,
+      String tag) {
     Bundle bundle = new Bundle();
     bundle.putInt(LAYOUT_PARAM1, layout);
     bundle.putSerializable(DATA_PARAM2, data);
@@ -156,16 +159,19 @@ public class BookActivity extends AppCompatActivity implements AddBookFragmentLi
     System.out.println(collections.get("OwnerAvailable"));
     return collections.get("OwnerAvailable");
   }
+
   public ArrayList<Book> getOwnerRequests() {
     System.out.println(collections.get("OwnerRequests"));
 
     return collections.get("OwnerRequests");
   }
+
   public ArrayList<Book> getOwnerAccepted() {
     System.out.println(collections.get("OwnerAccepted"));
 
     return collections.get("OwnerAccepted");
   }
+
   public ArrayList<Book> getOwnerLent() {
     System.out.println(collections.get("OwnerLent"));
 
@@ -202,8 +208,13 @@ public class BookActivity extends AppCompatActivity implements AddBookFragmentLi
   }
 
   @Override
-  public void onComplete(String author, String title, String isbn) {
-    bookController.addBook(user.getUUID(), author, isbn, title, new BookCallback() {
+  protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+  }
+
+  @Override
+  public void onComplete(String author, String title, String isbn, Bitmap image) {
+    bookController.addBook(author, isbn, title, image, new BookCallback() {
       @Override
       public void onSuccess(ArrayList<Book> books) {
         for (Fragment f : getSupportFragmentManager().getFragments()) {

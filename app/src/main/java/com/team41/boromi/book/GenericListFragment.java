@@ -30,6 +30,7 @@ public class GenericListFragment extends Fragment {
   private static final String MSG_PARAM3 = "Msg";
   private static final String PARENT_PARAM4 = "Parent";
   private static final String TAG_PARAM5 = "TAG";
+  public String tag;
   RecyclerView recyclerView;
   GenericListAdapter listAdapter;
   private ArrayList<Book> bookDataList = new ArrayList<>();
@@ -38,7 +39,6 @@ public class GenericListFragment extends Fragment {
   private String tempMsg;
   private String parent;
   private Map<Book, List<BookRequest>> bookWithRequests;
-  public String tag;
 
   public GenericListFragment() {
     // Required empty public constructor
@@ -78,7 +78,8 @@ public class GenericListFragment extends Fragment {
     TextView tempMsgView = view.findViewById(R.id.tempMessage);
     recyclerView = view.findViewById(R.id.generic_list);
 //    recyclerView.setHasFixedSize(true);
-    listAdapter = new GenericListAdapter(bookDataList, bookWithRequests, layoutID);
+    listAdapter = new GenericListAdapter(bookDataList, bookWithRequests, layoutID,
+        ((BookActivity) getActivity()).getBookController());
     System.out.println(tempMsg);
     System.out.println(getTag());
     recyclerView.setAdapter(listAdapter);

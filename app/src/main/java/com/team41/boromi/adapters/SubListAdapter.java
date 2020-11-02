@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.team41.boromi.R;
 import com.team41.boromi.models.Book;
 import com.team41.boromi.models.BookRequest;
-import com.team41.boromi.models.User;
 import java.util.ArrayList;
 
 public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHolder> {

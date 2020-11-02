@@ -16,7 +16,6 @@ import com.team41.boromi.R;
 import com.team41.boromi.adapters.PagerAdapter;
 import com.team41.boromi.callbacks.BookCallback;
 import com.team41.boromi.callbacks.BookRequestCallback;
-import com.team41.boromi.constants.CommonConstants.BookStatus;
 import com.team41.boromi.constants.CommonConstants.BookWorkflowStage;
 import com.team41.boromi.models.Book;
 import com.team41.boromi.models.BookRequest;
@@ -78,12 +77,14 @@ public class OwnedFragment extends Fragment {
 
     Bundle bundle;
     bundle = bookActivity.setupBundle(R.layout.available, new ArrayList<>(),
-        "These are all the books that you own that are available for other people to borrow", parent, "Available");
+        "These are all the books that you own that are available for other people to borrow",
+        parent, "Available");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
 
     bundle = bookActivity.setupBundle(R.layout.reqom, new ArrayList<>(),
-        "These are all the books you own that other people have requested to borrow", parent, "Requested");
+        "These are all the books you own that other people have requested to borrow", parent,
+        "Requested");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
 
@@ -123,19 +124,21 @@ public class OwnedFragment extends Fragment {
 
 
   public void getOwnerAvailable(GenericListFragment fragment) {
-    bookActivity.getBookController().getOwnerAvailableBooks(bookActivity.getUser().getUUID(), new BookCallback() {
-      @Override
-      public void onSuccess(ArrayList<Book> books) {
-        bookActivity.getCollections().put("OwnerAvailable", books);
-        fragment.updateData(books);
-      }
+    bookActivity.getBookController()
+        .getOwnerAvailableBooks(bookActivity.getUser().getUUID(), new BookCallback() {
+          @Override
+          public void onSuccess(ArrayList<Book> books) {
+            bookActivity.getCollections().put("OwnerAvailable", books);
+            fragment.updateData(books);
+          }
 
-      @Override
-      public void onFailure(Exception e) {
+          @Override
+          public void onFailure(Exception e) {
 
-      }
-    });
+          }
+        });
   }
+
   public void getOwnerRequests(GenericListFragment fragment) {
     bookActivity.getBookRequestController().getRequestOnOwnedBooks(new BookRequestCallback() {
       @Override
@@ -145,37 +148,42 @@ public class OwnedFragment extends Fragment {
       }
     });
   }
+
   public void getOwnerAccepted(GenericListFragment fragment) {
-    bookActivity.getBookController().getOwnerAcceptedBooks(bookActivity.getUser().getUUID(), new BookCallback() {
-      @Override
-      public void onSuccess(ArrayList<Book> books) {
-        bookActivity.getCollections().put("OwnerAccepted", books);
-        fragment.updateData(books);
-      }
+    bookActivity.getBookController()
+        .getOwnerAcceptedBooks(bookActivity.getUser().getUUID(), new BookCallback() {
+          @Override
+          public void onSuccess(ArrayList<Book> books) {
+            bookActivity.getCollections().put("OwnerAccepted", books);
+            fragment.updateData(books);
+          }
 
-      @Override
-      public void onFailure(Exception e) {
+          @Override
+          public void onFailure(Exception e) {
 
-      }
-    });
+          }
+        });
   }
+
   public void getOwnerLent(GenericListFragment fragment) {
-    bookActivity.getBookController().getOwnedBooks(bookActivity.getUser().getUUID(), new BookCallback() {
-      @Override
-      public void onSuccess(ArrayList<Book> books) {
-        bookActivity.getCollections().put("OwnedBooks", books);
-        bookActivity.getCollections().put("OwnerLent", (ArrayList<Book>) books.stream()
-            .filter((book -> book.getWorkflow() == BookWorkflowStage.BORROWED))
-            .collect(Collectors.toList()));
-        fragment.updateData(bookActivity.getOwnerLent());
-      }
+    bookActivity.getBookController()
+        .getOwnedBooks(bookActivity.getUser().getUUID(), new BookCallback() {
+          @Override
+          public void onSuccess(ArrayList<Book> books) {
+            bookActivity.getCollections().put("OwnedBooks", books);
+            bookActivity.getCollections().put("OwnerLent", (ArrayList<Book>) books.stream()
+                .filter((book -> book.getWorkflow() == BookWorkflowStage.BORROWED))
+                .collect(Collectors.toList()));
+            fragment.updateData(bookActivity.getOwnerLent());
+          }
 
-      @Override
-      public void onFailure(Exception e) {
+          @Override
+          public void onFailure(Exception e) {
 
-      }
-    });
+          }
+        });
   }
+
   public void getData(String tag, GenericListFragment fragment) {
     if (tag.equals("Available")) {
       getOwnerAvailable(fragment);
