@@ -30,6 +30,8 @@ public class BorrowedFragment extends Fragment {
   private PagerAdapter pagerAdapter;
   private BookActivity bookActivity;
 
+  private String parent = "Borrowed";
+
   public BorrowedFragment() {
     // Required empty public constructor
   }
@@ -77,7 +79,7 @@ public class BorrowedFragment extends Fragment {
     bookDataList.add(new Book("owner", "T21_2", "title", "123", BookStatus.AVAILABLE,
         BookWorkflowStage.AVAILABLE, "borower"));
     bundle = bookActivity.setupBundle(R.layout.borrowing, bookDataList,
-        "These are all the books that you have borrowed currently");
+        "These are all the books that you have borrowed currently", parent, "Borrowed");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
 
@@ -87,7 +89,7 @@ public class BorrowedFragment extends Fragment {
     bookDataList.add(new Book("owner", "T22_2", "title", "123", BookStatus.AVAILABLE,
         BookWorkflowStage.AVAILABLE, "borower"));
     bundle = bookActivity.setupBundle(R.layout.reqbm, bookDataList,
-        "These are all the books that you have requested to borrow");
+        "These are all the books that you have requested to borrow", parent, "Requested");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
 
@@ -97,7 +99,7 @@ public class BorrowedFragment extends Fragment {
     bookDataList.add(new Book("owner", "T23_2", "title", "123", BookStatus.AVAILABLE,
         BookWorkflowStage.AVAILABLE, "borower"));
     bundle = bookActivity.setupBundle(R.layout.accepted, bookDataList,
-        "These are all the books that you have been accepted to borrow");
+        "These are all the books that you have been accepted to borrow", parent, "Accepted");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
 

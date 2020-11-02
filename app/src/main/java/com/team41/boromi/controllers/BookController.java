@@ -96,12 +96,12 @@ public class BookController {
 
     /**
      * Get Owner's Books
-     * @param owner
+     * @param uid
      */
-    public void getOwnedBooks(String owner, final BookCallback bookCallback){
-        if (isNotNullOrEmpty(owner)) {
+    public void getOwnedBooks(String uid, final BookCallback bookCallback){
+        if (isNotNullOrEmpty(uid)) {
             executor.execute(() -> {
-                ArrayList<Book> ownedBooks = bookDB.getUsersOwnedBooks(owner);
+                ArrayList<Book> ownedBooks = bookDB.getUsersOwnedBooks(uid);
                 if (ownedBooks != null) {
                     Log.d(TAG, " get owner books success");
                     bookCallback.onSuccess(ownedBooks);

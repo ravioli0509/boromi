@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.team41.boromi.BookActivity;
 import com.team41.boromi.R;
 import com.team41.boromi.adapters.GenericListAdapter;
 import com.team41.boromi.models.Book;
@@ -24,12 +25,16 @@ public class GenericListFragment extends Fragment {
   private static final String LAYOUT_PARAM1 = "LayoutID";
   private static final String DATA_PARAM2 = "Data";
   private static final String MSG_PARAM3 = "Msg";
+  private static final String PARENT_PARAM4 = "Parent";
+  private static final String TAG_PARAM5 = "TAG";
   RecyclerView recyclerView;
   GenericListAdapter listAdapter;
   private ArrayList<Book> bookDataList = new ArrayList<>();
   private int layoutID;
   // TODO: Rename and change types of parameters
   private String tempMsg;
+  private String parent;
+  private String tag;
 
   public GenericListFragment() {
     // Required empty public constructor
@@ -55,7 +60,10 @@ public class GenericListFragment extends Fragment {
       layoutID = getArguments().getInt(LAYOUT_PARAM1);
       bookDataList = (ArrayList<Book>) getArguments().getSerializable(DATA_PARAM2);
       tempMsg = getArguments().getString(MSG_PARAM3);
+      parent = getArguments().getString(PARENT_PARAM4);
+      tag = getArguments().getString(TAG_PARAM5);
     }
+
   }
 
   @Override
@@ -67,11 +75,31 @@ public class GenericListFragment extends Fragment {
     recyclerView = view.findViewById(R.id.generic_list);
     recyclerView.setHasFixedSize(true);
     listAdapter = new GenericListAdapter(bookDataList, layoutID);
-
+    System.out.println(tempMsg);
+    System.out.println(getTag());
     recyclerView.setAdapter(listAdapter);
     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
     tempMsgView.setText(tempMsg);
+    if (parent.equals("Owned")) {
+      ((OwnedFragment) getParentFragment()).getData(tag, this);
+    }
     return view;
   }
+
+  public void updateData(ArrayList<Book> books) {
+    this.bookDataList.clear();
+    this.bookDataList.addAll(books);
+
+    System.out.println("Updateing with tag " + tag);
+    System.out.println(books);
+    getActivity().runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        listAdapter.notifyDataSetChanged();
+      }
+    });
+  }
+
+
 }

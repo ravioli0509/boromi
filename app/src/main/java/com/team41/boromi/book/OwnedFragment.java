@@ -14,10 +14,13 @@ import com.google.android.material.tabs.TabLayout.Tab;
 import com.team41.boromi.BookActivity;
 import com.team41.boromi.R;
 import com.team41.boromi.adapters.PagerAdapter;
+import com.team41.boromi.callbacks.BookCallback;
 import com.team41.boromi.constants.CommonConstants.BookStatus;
 import com.team41.boromi.constants.CommonConstants.BookWorkflowStage;
 import com.team41.boromi.models.Book;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A simple {@link Fragment} subclass. Use the {@link OwnedFragment#newInstance} factory method to
@@ -29,6 +32,7 @@ public class OwnedFragment extends Fragment {
   private ViewPager2 viewPager2;
   private PagerAdapter pagerAdapter;
   private BookActivity bookActivity;
+  private String parent = "Owned";
 
   public OwnedFragment() {
     // Required empty public constructor
@@ -71,42 +75,42 @@ public class OwnedFragment extends Fragment {
 
     Bundle bundle;
     ArrayList<Book> bookDataList = new ArrayList<>();
-    bookDataList.add(new Book("owner", "T11_1", "title", "123", BookStatus.AVAILABLE,
-        BookWorkflowStage.AVAILABLE, "borower"));
-    bookDataList.add(new Book("owner", "T11_2", "title", "123", BookStatus.AVAILABLE,
-        BookWorkflowStage.AVAILABLE, "borower"));
+//    bookDataList.add(new Book("owner", "T11_1", "title", "123", BookStatus.AVAILABLE,
+//        BookWorkflowStage.AVAILABLE, "borower"));
+//    bookDataList.add(new Book("owner", "T11_2", "title", "123", BookStatus.AVAILABLE,
+//        BookWorkflowStage.AVAILABLE, "borower"));
     bundle = bookActivity.setupBundle(R.layout.available, bookDataList,
-        "These are all the books that you own that are available for other people to borrow");
+        "These are all the books that you own that are available for other people to borrow", parent, "Available");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
 
-    bookDataList = new ArrayList<>();
-    bookDataList.add(new Book("owner", "T12_1", "title", "123", BookStatus.AVAILABLE,
-        BookWorkflowStage.AVAILABLE, "borower"));
-    bookDataList.add(new Book("owner", "T12_2", "title", "123", BookStatus.AVAILABLE,
-        BookWorkflowStage.AVAILABLE, "borower"));
+//    bookDataList = new ArrayList<>();
+//    bookDataList.add(new Book("owner", "T12_1", "title", "123", BookStatus.AVAILABLE,
+//        BookWorkflowStage.AVAILABLE, "borower"));
+//    bookDataList.add(new Book("owner", "T12_2", "title", "123", BookStatus.AVAILABLE,
+//        BookWorkflowStage.AVAILABLE, "borower"));
     bundle = bookActivity.setupBundle(R.layout.reqom, bookDataList,
-        "These are all the books you own that other people have requested to borrow");
+        "These are all the books you own that other people have requested to borrow", parent, "Requested");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
 
-    bookDataList = new ArrayList<>();
-    bookDataList.add(new Book("owner", "T13_1", "title", "123", BookStatus.AVAILABLE,
-        BookWorkflowStage.AVAILABLE, "borower"));
-    bookDataList.add(new Book("owner", "T13_2", "title", "123", BookStatus.AVAILABLE,
-        BookWorkflowStage.AVAILABLE, "borower"));
+//    bookDataList = new ArrayList<>();
+//    bookDataList.add(new Book("owner", "T13_1", "title", "123", BookStatus.AVAILABLE,
+//        BookWorkflowStage.AVAILABLE, "borower"));
+//    bookDataList.add(new Book("owner", "T13_2", "title", "123", BookStatus.AVAILABLE,
+//        BookWorkflowStage.AVAILABLE, "borower"));
     bundle = bookActivity.setupBundle(R.layout.accepted, bookDataList,
-        "These are all the book requests that you have accepted");
+        "These are all the book requests that you have accepted", parent, "Accepted");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
 
-    bookDataList = new ArrayList<>();
-    bookDataList.add(new Book("owner", "T14_1", "title", "123", BookStatus.AVAILABLE,
-        BookWorkflowStage.AVAILABLE, "borower"));
-    bookDataList.add(new Book("owner", "T14_2", "title", "123", BookStatus.AVAILABLE,
-        BookWorkflowStage.AVAILABLE, "borower"));
+//    bookDataList = new ArrayList<>();
+//    bookDataList.add(new Book("owner", "T14_1", "title", "123", BookStatus.AVAILABLE,
+//        BookWorkflowStage.AVAILABLE, "borower"));
+//    bookDataList.add(new Book("owner", "T14_2", "title", "123", BookStatus.AVAILABLE,
+//        BookWorkflowStage.AVAILABLE, "borower"));
     bundle = bookActivity.setupBundle(R.layout.lent, bookDataList,
-        "These are all your books that are being borrowed by other people");
+        "These are all your books that are being borrowed by other people", parent, "Lent");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
 
@@ -115,7 +119,6 @@ public class OwnedFragment extends Fragment {
     viewPager2.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
     viewPager2.setOffscreenPageLimit(tabLayout.getTabCount());
     viewPager2.setAdapter(pagerAdapter);
-
     tabLayout.addOnTabSelectedListener(new OnTabSelectedListener() {
       @Override
       public void onTabSelected(Tab tab) {
@@ -133,5 +136,77 @@ public class OwnedFragment extends Fragment {
       }
     });
     return view;
+  }
+
+
+  public void getOwnerAvailable(GenericListFragment fragment) {
+    bookActivity.getBookController().getOwnerAvailableBooks(bookActivity.getUser().getUUID(), new BookCallback() {
+      @Override
+      public void onSuccess(ArrayList<Book> books) {
+        bookActivity.getCollections().put("OwnerAvailable", books);
+        fragment.updateData(books);
+      }
+
+      @Override
+      public void onFailure(Exception e) {
+
+      }
+    });
+  }
+  public void getOwnerRequests(GenericListFragment fragment) {
+    bookActivity.getBookController().getOwnerRequestedBooks(bookActivity.getUser().getUUID(), new BookCallback() {
+      @Override
+      public void onSuccess(ArrayList<Book> books) {
+        bookActivity.getCollections().put("OwnerRequests", books);
+        fragment.updateData(books);
+      }
+
+      @Override
+      public void onFailure(Exception e) {
+
+      }
+    });
+  }
+  public void getOwnerAccepted(GenericListFragment fragment) {
+    bookActivity.getBookController().getOwnerAcceptedBooks(bookActivity.getUser().getUUID(), new BookCallback() {
+      @Override
+      public void onSuccess(ArrayList<Book> books) {
+        bookActivity.getCollections().put("OwnerAccepted", books);
+        fragment.updateData(books);
+      }
+
+      @Override
+      public void onFailure(Exception e) {
+
+      }
+    });
+  }
+  public void getOwnerLent(GenericListFragment fragment) {
+    bookActivity.getBookController().getOwnedBooks(bookActivity.getUser().getUUID(), new BookCallback() {
+      @Override
+      public void onSuccess(ArrayList<Book> books) {
+        bookActivity.getCollections().put("OwnedBooks", books);
+        bookActivity.getCollections().put("OwnerLent", (ArrayList<Book>) books.stream()
+            .filter((book -> book.getWorkflow() == BookWorkflowStage.BORROWED))
+            .collect(Collectors.toList()));
+        fragment.updateData(bookActivity.getOwnerLent());
+      }
+
+      @Override
+      public void onFailure(Exception e) {
+
+      }
+    });
+  }
+  public void getData(String tag, GenericListFragment fragment) {
+    if (tag.equals("Available")) {
+      getOwnerAvailable(fragment);
+    } else if (tag.equals("Requested")) {
+      getOwnerRequests(fragment);
+    } else if (tag.equals("Accepted")) {
+//      getOwnerAccepted(fragment);
+    } else if (tag.equals("Lent")) {
+//      getOwnerLent(fragment);
+    }
   }
 }

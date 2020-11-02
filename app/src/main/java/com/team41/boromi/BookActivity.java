@@ -20,9 +20,17 @@ import com.team41.boromi.book.MapFragment;
 import com.team41.boromi.book.OwnedFragment;
 import com.team41.boromi.book.SearchFragment;
 import com.team41.boromi.book.SettingsFragment;
+import com.team41.boromi.callbacks.BookCallback;
 import com.team41.boromi.callbacks.ReturnCallback;
+import com.team41.boromi.constants.CommonConstants.BookWorkflowStage;
+import com.team41.boromi.controllers.BookController;
+import com.team41.boromi.controllers.BookRequestController;
 import com.team41.boromi.controllers.BookReturnController;
+import com.team41.boromi.models.User;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import com.team41.boromi.models.Book;
 import java.util.ArrayList;
@@ -32,19 +40,31 @@ public class BookActivity extends AppCompatActivity {
   private static final String LAYOUT_PARAM1 = "LayoutID";
   private static final String DATA_PARAM2 = "Data";
   private static final String MSG_PARAM3 = "Msg";
+  private static final String PARENT_PARAM4 = "Parent";
+  private static final String TAG_PARAM5 = "TAG";
+
   private final String TAG = "BOOK ACTIVITY";
   @Inject
   BookReturnController bookReturnController;
+  @Inject
+  BookController bookController;
+  @Inject
+  BookRequestController bookRequestController;
+  @Inject
+  User user;
+
   private ViewPager2 viewPager2;
   private PagerAdapter pagerAdapter;
   private TabLayout tabLayout;
+
+  private Map<String, ArrayList<Book>> collections = new HashMap<>();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_book);
     ((BoromiApp) getApplicationContext()).appComponent.inject(this);
-
+    pagerAdapter = new PagerAdapter(getSupportFragmentManager(), getLifecycle());
     Toolbar toolbar = (Toolbar) findViewById(R.id.book_toolbar);
     setSupportActionBar(toolbar);
 
@@ -57,7 +77,6 @@ public class BookActivity extends AppCompatActivity {
     TabItem tabSettings = findViewById(R.id.tab_settings);
 
     // Add fragments for each tab
-    pagerAdapter = new PagerAdapter(getSupportFragmentManager(), getLifecycle());
     pagerAdapter.addFragment(new Pair<Class<? extends Fragment>, Bundle>(OwnedFragment.class, null));
     pagerAdapter.addFragment(new Pair<Class<? extends Fragment>, Bundle>(BorrowedFragment.class, null));
     pagerAdapter.addFragment(new Pair<Class<? extends Fragment>, Bundle>(SearchFragment.class, null));
@@ -69,7 +88,6 @@ public class BookActivity extends AppCompatActivity {
     viewPager2.setOffscreenPageLimit(tabLayout.getTabCount());
     viewPager2.setUserInputEnabled(false);
     viewPager2.setAdapter(pagerAdapter);
-
     tabLayout.addOnTabSelectedListener(new OnTabSelectedListener() {
       @Override
       public void onTabSelected(Tab tab) {
@@ -109,11 +127,53 @@ public class BookActivity extends AppCompatActivity {
   }
 
 
-  public Bundle setupBundle(int layout, ArrayList<Book> data, String messsge) {
+  public Bundle setupBundle(int layout, ArrayList<Book> data, String messsge, String parent, String tag) {
     Bundle bundle = new Bundle();
     bundle.putInt(LAYOUT_PARAM1, layout);
     bundle.putSerializable(DATA_PARAM2, data);
     bundle.putString(MSG_PARAM3, messsge);
+    bundle.putString(PARENT_PARAM4, parent);
+    bundle.putString(TAG_PARAM5, tag);
     return bundle;
+  }
+
+  public ArrayList<Book> getOwnerAvailable() {
+    System.out.println(collections.get("OwnerAvailable"));
+    return collections.get("OwnerAvailable");
+  }
+  public ArrayList<Book> getOwnerRequests() {
+    System.out.println(collections.get("OwnerRequests"));
+
+    return collections.get("OwnerRequests");
+  }
+  public ArrayList<Book> getOwnerAccepted() {
+    System.out.println(collections.get("OwnerAccepted"));
+
+    return collections.get("OwnerAccepted");
+  }
+  public ArrayList<Book> getOwnerLent() {
+    System.out.println(collections.get("OwnerLent"));
+
+    return collections.get("OwnerLent");
+  }
+
+  public BookReturnController getBookReturnController() {
+    return bookReturnController;
+  }
+
+  public BookController getBookController() {
+    return bookController;
+  }
+
+  public BookRequestController getBookRequestController() {
+    return bookRequestController;
+  }
+
+  public User getUser() {
+    return user;
+  }
+
+  public Map<String, ArrayList<Book>> getCollections() {
+    return collections;
   }
 }

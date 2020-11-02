@@ -3,6 +3,7 @@ package com.team41.boromi;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.team41.boromi.constants.CommonConstants.BookStatus;
 import com.team41.boromi.dbs.BookDB;
 import com.team41.boromi.models.Book;
 
@@ -31,12 +32,14 @@ public class BookDBTest {
 		// This assumes correct functionality of the pushBook method but
 		// I didn't know a better way to automate the process of setting up
 		// A consistent testing environment
-		testBooks.add(bookDB.pushBook(new Book(
-				"testuser1",
-				"The Hobbit",
+		Book book = new Book(
+				"DaGQbX2HLfditCUDKq9X1bRnXQ82",
+				"This should be Acepted",
 				"JK Rowling",
 				"123456789012"
-		)));
+		);
+		book.setStatus(BookStatus.ACCEPTED);
+		testBooks.add(bookDB.pushBook(book));
 	}
 
 	@After
@@ -45,8 +48,8 @@ public class BookDBTest {
 		// This assumes correct functionality of the deleteBook method but
 		// I didn't know a better way to automate the process of setting up
 		// A consistent testing environment
-		for (Book book : testBooks)
-			bookDB.deleteBook(book.getBookId());
+//		for (Book book : testBooks)
+//			bookDB.deleteBook(book.getBookId());
 
 		testBooks.clear();
 	}
