@@ -49,10 +49,11 @@ public class BookController {
             addingBook.setStatus(status.AVAILABLE);
             addingBook.setWorkflow(workflow.AVAILABLE);
             executor.execute(() -> {
-                Book result = bookDB.pushBook(addingBook);
-                if (result != null) {
-//                    Log.d(TAG, " book add success");
-                    bookCallback.onSuccess(null);
+                ArrayList<Book> addedBook = new ArrayList<>();
+                addedBook.add(bookDB.pushBook(addingBook));
+                if (addedBook != null) {
+                    Log.d(TAG, " book add success");
+                    bookCallback.onSuccess(addedBook);
                 } else {
                     Log.d(TAG, " book add error");
                     bookCallback.onFailure(new IllegalArgumentException());
@@ -75,16 +76,18 @@ public class BookController {
     public void editBook(String bookID, String author, String ISBN, String title, final BookCallback bookCallback){
         if (isNotNullOrEmpty(author) && isNotNullOrEmpty(ISBN) && isNotNullOrEmpty(title)) {
             executor.execute(() -> {
+                ArrayList<Book> edited = new ArrayList<>();
                 Book editingBook = bookDB.getBook(bookID);
                 if (editingBook != null) {
                     editingBook.setTitle(title);
                     editingBook.setAuthor(author);
                     editingBook.setISBN(ISBN);
-                    bookDB.pushBook(editingBook);
-                    Log.d(TAG, " book add success");
-                    bookCallback.onSuccess(null);
+                    edited.add(bookDB.pushBook(editingBook));
+                    Log.d(TAG, " book edit success");
+
+                    bookCallback.onSuccess(edited);
                 } else {
-                    Log.d(TAG, " book add error");
+                    Log.d(TAG, " book edit error");
                     bookCallback.onFailure(new IllegalArgumentException());
                 }
             });
@@ -100,10 +103,10 @@ public class BookController {
             executor.execute(() -> {
                 ArrayList<Book> ownedBooks = bookDB.getUsersOwnedBooks(owner);
                 if (ownedBooks != null) {
-                    Log.d(TAG, " get books success");
+                    Log.d(TAG, " get owner books success");
                     bookCallback.onSuccess(ownedBooks);
                 } else {
-                    Log.d(TAG, " get books error");
+                    Log.d(TAG, " get owner books error");
                     bookCallback.onFailure(new IllegalArgumentException());
                 }
             });
@@ -141,7 +144,7 @@ public class BookController {
      * @param keywords
      * @return
      */
-    public ArrayList<Book> findBooks(String keywords, final BookCallback bookCallback) {
+    public void findBooks(String keywords, final BookCallback bookCallback) {
         ArrayList<Book> searchedBooks = new ArrayList<Book>();
         if (isNotNullOrEmpty(keywords)) {
             executor.execute(() -> {
@@ -153,8 +156,11 @@ public class BookController {
                            searchedBooks.add(eachBook);
                        }
                    }
-                   bookCallback.onSuccess(searchedBooks);
-                   Log.d(TAG, " Success");
+                   if (searchedBooks.size() > 0) {
+                       bookCallback.onSuccess(searchedBooks);
+                   } else {
+                       bookCallback.onFailure(new NullPointerException());
+                   }
                } else {
                    Log.d(TAG, " Error in one of the columns");
                    bookCallback.onFailure(new IllegalArgumentException());
@@ -164,7 +170,6 @@ public class BookController {
             Log.d(TAG, "Keyword is empty or null");
             bookCallback.onFailure(new IllegalArgumentException());
         }
-        return searchedBooks;
     }
 
     /**
@@ -177,10 +182,10 @@ public class BookController {
             executor.execute(() -> {
                 ArrayList<Book> requestedBooks = bookDB.getOwnerRequestedBooks(owner);
                 if (requestedBooks != null) {
-                    Log.d(TAG, " get books success");
+                    Log.d(TAG, " get requested books success");
                     bookCallback.onSuccess(requestedBooks);
                 } else {
-                    Log.d(TAG, " get books error");
+                    Log.d(TAG, " get requested books error");
                     bookCallback.onFailure(new IllegalArgumentException());
                 }
             });
@@ -200,10 +205,10 @@ public class BookController {
             executor.execute(() -> {
                 ArrayList<Book> borrowedBooks = bookDB.getOwnerBorrowedBooks(owner);
                 if (borrowedBooks != null) {
-                    Log.d(TAG, " get books success");
+                    Log.d(TAG, " get borrowed books success");
                     bookCallback.onSuccess(borrowedBooks);
                 } else {
-                    Log.d(TAG, " get books error");
+                    Log.d(TAG, " get borrowed books error");
                     bookCallback.onFailure(new IllegalArgumentException());
                 }
             });
@@ -223,10 +228,10 @@ public class BookController {
             executor.execute(() -> {
                 ArrayList<Book> acceptedBooks = bookDB.getOwnerAcceptedBooks(owner);
                 if (acceptedBooks != null) {
-                    Log.d(TAG, " get books success");
+                    Log.d(TAG, " get accepted books success");
                     bookCallback.onSuccess(acceptedBooks);
                 } else {
-                    Log.d(TAG, " get books error");
+                    Log.d(TAG, " get accepted books error");
                     bookCallback.onFailure(new IllegalArgumentException());
                 }
             });
@@ -246,10 +251,10 @@ public class BookController {
             executor.execute(() -> {
                 ArrayList<Book> availableBooks = bookDB.getOwnerAvailableBooks(owner);
                 if (availableBooks != null) {
-                    Log.d(TAG, " get books success");
+                    Log.d(TAG, " get available books success");
                     bookCallback.onSuccess(availableBooks);
                 } else {
-                    Log.d(TAG, " get books error");
+                    Log.d(TAG, " get available books error");
                     bookCallback.onFailure(new IllegalArgumentException());
                 }
             });
