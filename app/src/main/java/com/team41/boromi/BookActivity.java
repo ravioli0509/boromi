@@ -5,16 +5,22 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener;
 import com.google.android.material.tabs.TabLayout.Tab;
 import com.team41.boromi.adapters.PagerAdapter;
+import com.team41.boromi.book.AddBookFragment;
+import com.team41.boromi.book.AddBookFragment.AddBookFragmentListener;
 import com.team41.boromi.book.BorrowedFragment;
 import com.team41.boromi.book.MapFragment;
 import com.team41.boromi.book.OwnedFragment;
@@ -35,7 +41,7 @@ import javax.inject.Inject;
 import com.team41.boromi.models.Book;
 import java.util.ArrayList;
 
-public class BookActivity extends AppCompatActivity {
+public class BookActivity extends AppCompatActivity implements AddBookFragmentListener {
 
   private static final String LAYOUT_PARAM1 = "LayoutID";
   private static final String DATA_PARAM2 = "Data";
@@ -58,7 +64,7 @@ public class BookActivity extends AppCompatActivity {
   private TabLayout tabLayout;
 
   private Map<String, ArrayList<Book>> collections = new HashMap<>();
-
+  private MenuItem addButton;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -104,6 +110,7 @@ public class BookActivity extends AppCompatActivity {
 
       }
     });
+
   }
 
   @Override
@@ -117,6 +124,9 @@ public class BookActivity extends AppCompatActivity {
     switch (item.getItemId()) {
       case R.id.toolbar_add:
         // TODO add toolbar add logic
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        AddBookFragment addBookFragment = AddBookFragment.newInstance();
+        addBookFragment.show(fragmentManager, "addBook");
         return true;
       case R.id.toolbar_scan:
         // TODO add toolbar scan logic
@@ -175,5 +185,20 @@ public class BookActivity extends AppCompatActivity {
 
   public Map<String, ArrayList<Book>> getCollections() {
     return collections;
+  }
+
+  @Override
+  public void onComplete(String author, String title, String isbn) {
+    bookController.addBook(user.getUUID(), author, isbn, title, new BookCallback() {
+      @Override
+      public void onSuccess(ArrayList<Book> books) {
+
+      }
+
+      @Override
+      public void onFailure(Exception e) {
+
+      }
+    });
   }
 }

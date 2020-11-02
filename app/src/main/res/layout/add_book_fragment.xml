@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="300dp"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:padding="8dp"
     android:background="@drawable/cardshape"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".book.AddBookFragment">
 
     <TextView
         android:layout_width="match_parent"
@@ -29,7 +31,7 @@
             android:id="@+id/book_image"/>
 
         <EditText
-            android:id="@+id/author"
+            android:id="@+id/add_book_author"
             android:layout_width="251dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -40,7 +42,7 @@
         </EditText>
     </LinearLayout>
     <EditText
-        android:id="@+id/title"
+        android:id="@+id/add_book_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -49,7 +51,7 @@
         android:background="#22191919"
         android:text="Title"></EditText>
     <EditText
-    android:id="@+id/isbn"
+    android:id="@+id/add_book_isbn"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_weight="1"
@@ -58,7 +60,7 @@
     android:background="#22191919"
     android:text="ISBN"></EditText>
     <Button
-        android:id="@+id/add_button"
+        android:id="@+id/add_book_add_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"

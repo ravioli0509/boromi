@@ -73,7 +73,7 @@ public class GenericListFragment extends Fragment {
     View view = inflater.inflate(R.layout.fragment_generic_list, container, false);
     TextView tempMsgView = view.findViewById(R.id.tempMessage);
     recyclerView = view.findViewById(R.id.generic_list);
-    recyclerView.setHasFixedSize(true);
+//    recyclerView.setHasFixedSize(true);
     listAdapter = new GenericListAdapter(bookDataList, layoutID);
     System.out.println(tempMsg);
     System.out.println(getTag());
@@ -83,6 +83,8 @@ public class GenericListFragment extends Fragment {
     tempMsgView.setText(tempMsg);
     if (parent.equals("Owned")) {
       ((OwnedFragment) getParentFragment()).getData(tag, this);
+    } else if (parent.equals("Borrowed")) {
+      ((BorrowedFragment) getParentFragment()).getData(tag, this);
     }
     return view;
   }
@@ -90,9 +92,6 @@ public class GenericListFragment extends Fragment {
   public void updateData(ArrayList<Book> books) {
     this.bookDataList.clear();
     this.bookDataList.addAll(books);
-
-    System.out.println("Updateing with tag " + tag);
-    System.out.println(books);
     getActivity().runOnUiThread(new Runnable() {
       @Override
       public void run() {

@@ -74,42 +74,22 @@ public class OwnedFragment extends Fragment {
     pagerAdapter = new PagerAdapter(getChildFragmentManager(), getLifecycle());
 
     Bundle bundle;
-    ArrayList<Book> bookDataList = new ArrayList<>();
-//    bookDataList.add(new Book("owner", "T11_1", "title", "123", BookStatus.AVAILABLE,
-//        BookWorkflowStage.AVAILABLE, "borower"));
-//    bookDataList.add(new Book("owner", "T11_2", "title", "123", BookStatus.AVAILABLE,
-//        BookWorkflowStage.AVAILABLE, "borower"));
-    bundle = bookActivity.setupBundle(R.layout.available, bookDataList,
+    bundle = bookActivity.setupBundle(R.layout.available, new ArrayList<>(),
         "These are all the books that you own that are available for other people to borrow", parent, "Available");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
 
-//    bookDataList = new ArrayList<>();
-//    bookDataList.add(new Book("owner", "T12_1", "title", "123", BookStatus.AVAILABLE,
-//        BookWorkflowStage.AVAILABLE, "borower"));
-//    bookDataList.add(new Book("owner", "T12_2", "title", "123", BookStatus.AVAILABLE,
-//        BookWorkflowStage.AVAILABLE, "borower"));
-    bundle = bookActivity.setupBundle(R.layout.reqom, bookDataList,
+    bundle = bookActivity.setupBundle(R.layout.reqom, new ArrayList<>(),
         "These are all the books you own that other people have requested to borrow", parent, "Requested");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
 
-//    bookDataList = new ArrayList<>();
-//    bookDataList.add(new Book("owner", "T13_1", "title", "123", BookStatus.AVAILABLE,
-//        BookWorkflowStage.AVAILABLE, "borower"));
-//    bookDataList.add(new Book("owner", "T13_2", "title", "123", BookStatus.AVAILABLE,
-//        BookWorkflowStage.AVAILABLE, "borower"));
-    bundle = bookActivity.setupBundle(R.layout.accepted, bookDataList,
+    bundle = bookActivity.setupBundle(R.layout.accepted, new ArrayList<>(),
         "These are all the book requests that you have accepted", parent, "Accepted");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
 
-//    bookDataList = new ArrayList<>();
-//    bookDataList.add(new Book("owner", "T14_1", "title", "123", BookStatus.AVAILABLE,
-//        BookWorkflowStage.AVAILABLE, "borower"));
-//    bookDataList.add(new Book("owner", "T14_2", "title", "123", BookStatus.AVAILABLE,
-//        BookWorkflowStage.AVAILABLE, "borower"));
-    bundle = bookActivity.setupBundle(R.layout.lent, bookDataList,
+    bundle = bookActivity.setupBundle(R.layout.lent, new ArrayList<>(),
         "These are all your books that are being borrowed by other people", parent, "Lent");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
@@ -204,9 +184,9 @@ public class OwnedFragment extends Fragment {
     } else if (tag.equals("Requested")) {
       getOwnerRequests(fragment);
     } else if (tag.equals("Accepted")) {
-//      getOwnerAccepted(fragment);
+      getOwnerAccepted(fragment);
     } else if (tag.equals("Lent")) {
-//      getOwnerLent(fragment);
+      getOwnerLent(fragment);
     }
   }
 }
