@@ -12,7 +12,10 @@ import com.team41.boromi.BookActivity;
 import com.team41.boromi.R;
 import com.team41.boromi.adapters.GenericListAdapter;
 import com.team41.boromi.models.Book;
+import com.team41.boromi.models.BookRequest;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass. Use the {@link GenericListFragment#newInstance} factory
@@ -34,7 +37,8 @@ public class GenericListFragment extends Fragment {
   // TODO: Rename and change types of parameters
   private String tempMsg;
   private String parent;
-  private String tag;
+  private Map<Book, List<BookRequest>> bookWithRequests;
+  public String tag;
 
   public GenericListFragment() {
     // Required empty public constructor
@@ -74,7 +78,7 @@ public class GenericListFragment extends Fragment {
     TextView tempMsgView = view.findViewById(R.id.tempMessage);
     recyclerView = view.findViewById(R.id.generic_list);
 //    recyclerView.setHasFixedSize(true);
-    listAdapter = new GenericListAdapter(bookDataList, layoutID);
+    listAdapter = new GenericListAdapter(bookDataList, bookWithRequests, layoutID);
     System.out.println(tempMsg);
     System.out.println(getTag());
     recyclerView.setAdapter(listAdapter);
@@ -100,5 +104,19 @@ public class GenericListFragment extends Fragment {
     });
   }
 
+  public void updateData(Map<Book, List<BookRequest>> bookWithRequests) {
+//    this.bookWithRequests.clear();
+    this.bookDataList.clear();
+    this.bookDataList.addAll(bookWithRequests.keySet());
+    this.bookWithRequests = bookWithRequests;
+    listAdapter.setBookWithRequests(bookWithRequests);
+    getActivity().runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        listAdapter.notifyDataSetChanged();
+        listAdapter.notifySubAdapters();
+      }
+    });
+  }
 
 }

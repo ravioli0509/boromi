@@ -7,15 +7,24 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.team41.boromi.R;
+import com.team41.boromi.models.Book;
+import com.team41.boromi.models.BookRequest;
 import com.team41.boromi.models.User;
 import java.util.ArrayList;
 
 public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHolder> {
 
-  private ArrayList<User> usersRequested;
+  private ArrayList<BookRequest> usersRequested;
+  private Book book;
 
-  public SubListAdapter(ArrayList<User> usersRequested) {
-    this.usersRequested = usersRequested;
+  public SubListAdapter(ArrayList<BookRequest> usersRequested, Book book) {
+    this.book = book;
+    if (usersRequested == null) {
+      this.usersRequested = new ArrayList<>();
+    } else {
+      this.usersRequested = usersRequested;
+
+    }
   }
 
   @NonNull
@@ -29,12 +38,20 @@ public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHold
 
   @Override
   public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-    holder.user.setText(usersRequested.get(position).getUsername());
+    holder.user.setText(usersRequested.get(position).getRequestorName());
   }
 
   @Override
   public int getItemCount() {
     return usersRequested.size();
+  }
+
+  public void setUsersRequested(ArrayList<BookRequest> usersRequested) {
+    this.usersRequested = usersRequested;
+  }
+
+  public Book getBook() {
+    return book;
   }
 
   public static class ViewHolder extends RecyclerView.ViewHolder {

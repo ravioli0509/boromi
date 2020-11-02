@@ -15,11 +15,14 @@ import com.team41.boromi.BookActivity;
 import com.team41.boromi.R;
 import com.team41.boromi.adapters.PagerAdapter;
 import com.team41.boromi.callbacks.BookCallback;
+import com.team41.boromi.callbacks.BookRequestCallback;
 import com.team41.boromi.constants.CommonConstants.BookStatus;
 import com.team41.boromi.constants.CommonConstants.BookWorkflowStage;
 import com.team41.boromi.models.Book;
+import com.team41.boromi.models.BookRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -134,16 +137,11 @@ public class OwnedFragment extends Fragment {
     });
   }
   public void getOwnerRequests(GenericListFragment fragment) {
-    bookActivity.getBookController().getOwnerRequestedBooks(bookActivity.getUser().getUUID(), new BookCallback() {
+    bookActivity.getBookRequestController().getRequestOnOwnedBooks(new BookRequestCallback() {
       @Override
-      public void onSuccess(ArrayList<Book> books) {
-        bookActivity.getCollections().put("OwnerRequests", books);
-        fragment.updateData(books);
-      }
-
-      @Override
-      public void onFailure(Exception e) {
-
+      public void onComplete(Map<Book, List<BookRequest>> bookWithRequests) {
+        bookActivity.setRequestsCollections(bookWithRequests);
+        fragment.updateData(bookWithRequests);
       }
     });
   }

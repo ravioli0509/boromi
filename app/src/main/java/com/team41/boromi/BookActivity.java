@@ -22,6 +22,7 @@ import com.team41.boromi.adapters.PagerAdapter;
 import com.team41.boromi.book.AddBookFragment;
 import com.team41.boromi.book.AddBookFragment.AddBookFragmentListener;
 import com.team41.boromi.book.BorrowedFragment;
+import com.team41.boromi.book.GenericListFragment;
 import com.team41.boromi.book.MapFragment;
 import com.team41.boromi.book.OwnedFragment;
 import com.team41.boromi.book.SearchFragment;
@@ -32,9 +33,11 @@ import com.team41.boromi.constants.CommonConstants.BookWorkflowStage;
 import com.team41.boromi.controllers.BookController;
 import com.team41.boromi.controllers.BookRequestController;
 import com.team41.boromi.controllers.BookReturnController;
+import com.team41.boromi.models.BookRequest;
 import com.team41.boromi.models.User;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -64,6 +67,8 @@ public class BookActivity extends AppCompatActivity implements AddBookFragmentLi
   private TabLayout tabLayout;
 
   private Map<String, ArrayList<Book>> collections = new HashMap<>();
+
+  private Map<Book, List<BookRequest>> requestsCollections = new HashMap<>();
   private MenuItem addButton;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -187,12 +192,30 @@ public class BookActivity extends AppCompatActivity implements AddBookFragmentLi
     return collections;
   }
 
+  public Map<Book, List<BookRequest>> getRequestsCollections() {
+    return requestsCollections;
+  }
+
+  public void setRequestsCollections(
+      Map<Book, List<BookRequest>> requestsCollections) {
+    this.requestsCollections = requestsCollections;
+  }
+
   @Override
   public void onComplete(String author, String title, String isbn) {
     bookController.addBook(user.getUUID(), author, isbn, title, new BookCallback() {
       @Override
       public void onSuccess(ArrayList<Book> books) {
-
+        for (Fragment f : getSupportFragmentManager().getFragments()) {
+          if (f.getClass().getSimpleName().equals("OwnedFragment")) {
+            for (Fragment fc : f.getChildFragmentManager().getFragments()) {
+              GenericListFragment gf = (GenericListFragment) fc;
+              if (gf.tag.equals("Available")) {
+                ((OwnedFragment) f).getData(gf.tag, gf);
+              }
+            }
+          }
+        }
       }
 
       @Override

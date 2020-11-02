@@ -139,7 +139,7 @@ public class BorrowedFragment extends Fragment {
   public void getBorrowedRequested(GenericListFragment fragment) {
     bookActivity.getBookRequestController().getRequestedBooks(new BookRequestCallback() {
       @Override
-      public void onComplete(List<BookRequest> bookRequests, Map<String, Book> bookMap) {
+      public void onComplete(Map<Book, List<BookRequest>> bookWithRequests) {
 
       }
     });

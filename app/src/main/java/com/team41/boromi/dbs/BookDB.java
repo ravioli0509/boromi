@@ -310,6 +310,7 @@ public class BookDB {
         continue;
       }
       bookMap.put(b, new ArrayList<>());
+			bookMap.get(b).add(br);
     }
 
 	return bookMap;

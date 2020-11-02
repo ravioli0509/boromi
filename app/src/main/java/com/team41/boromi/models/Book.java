@@ -250,4 +250,9 @@ public class Book implements Serializable {
     }
     return false;
   }
+
+  @Override
+  public int hashCode() {
+    return bookId.hashCode();
+  }
 }

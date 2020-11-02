@@ -9,20 +9,31 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.team41.boromi.R;
 import com.team41.boromi.models.Book;
+import com.team41.boromi.models.BookRequest;
 import com.team41.boromi.models.User;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.ViewHolder> {
 
   private ArrayList<Book> books;
   private int resource;
   private ViewGroup parent;
+  private Map<Book, List<BookRequest>> bookWithRequests;
+  private ArrayList<SubListAdapter> subListAdapters;
 
   public GenericListAdapter(ArrayList<Book> books, int id) {
     this.books = books;
     resource = id;
-    System.out.println("ID: ----- " + id);
   }
+  public GenericListAdapter(ArrayList<Book> books, Map<Book, List<BookRequest>> bookWithRequests, int id) {
+    this.books = books;
+    this.bookWithRequests = bookWithRequests;
+    subListAdapters = new ArrayList<>();
+    resource = id;
+  }
+
 
   @NonNull
   @Override
@@ -51,13 +62,16 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
     }
     if (holder.reqom != null) {
       RecyclerView recyclerView = holder.view.findViewById(R.id.reqom_request_list);
-      ArrayList<User> requesters = new ArrayList<>();
-      requesters.add(new User("testUser", "Andrew", "test123"));
-      requesters.add(new User("testUser", "Andrew", "test123"));
-
-      SubListAdapter subListAdapter = new SubListAdapter(requesters);
+      ArrayList<BookRequest> requesters;
+      if (bookWithRequests == null) {
+        requesters = new ArrayList<>();
+      } else {
+        requesters = (ArrayList<BookRequest>) bookWithRequests.get(book);
+      }
+      SubListAdapter subListAdapter = new SubListAdapter(requesters, book);
       recyclerView.setLayoutManager(new LinearLayoutManager(parent.getContext()));
       recyclerView.setAdapter(subListAdapter);
+      subListAdapters.add(subListAdapter);
     }
   }
 
@@ -83,30 +97,35 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
           title = itemView.findViewById(R.id.available_title);
           author = itemView.findViewById(R.id.available_author);
           isbn = itemView.findViewById(R.id.available_isbn);
+          reqom = null;
           break;
         case (R.layout.accepted):
           title = itemView.findViewById(R.id.accepted_title);
           author = itemView.findViewById(R.id.accepted_author);
           isbn = itemView.findViewById(R.id.accepted_isbn);
           user = itemView.findViewById(R.id.accepted_user);
+          reqom = null;
           break;
         case (R.layout.borrowing):
           title = itemView.findViewById(R.id.borrowing_title);
           author = itemView.findViewById(R.id.borrowing_author);
           isbn = itemView.findViewById(R.id.borrowing_isbn);
           user = itemView.findViewById(R.id.borrowing_user);
+          reqom = null;
           break;
         case (R.layout.lent):
           title = itemView.findViewById(R.id.lent_title);
           author = itemView.findViewById(R.id.lent_author);
           isbn = itemView.findViewById(R.id.lent_isbn);
           user = itemView.findViewById(R.id.lent_user);
+          reqom = null;
           break;
         case (R.layout.reqbm):
           title = itemView.findViewById(R.id.reqbm_title);
           author = itemView.findViewById(R.id.reqbm_author);
           isbn = itemView.findViewById(R.id.reqbm_isbn);
           user = itemView.findViewById(R.id.reqbm_user);
+          reqom = null;
           break;
         case (R.layout.reqom):
           title = itemView.findViewById(R.id.reqom_title);
@@ -120,8 +139,27 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
           author = itemView.findViewById(R.id.searched_author);
           isbn = itemView.findViewById(R.id.searched_isbn);
           user = itemView.findViewById(R.id.searched_user);
+          reqom = null;
       }
 
+    }
+  }
+
+  public void setBookWithRequests(
+      Map<Book, List<BookRequest>> bookWithRequests) {
+    this.bookWithRequests = bookWithRequests;
+  }
+
+  public ArrayList<SubListAdapter> getSubListAdapters() {
+    return subListAdapters;
+  }
+
+  public void notifySubAdapters() {
+    for (SubListAdapter subListAdapter : subListAdapters) {
+      subListAdapter.setUsersRequested(
+          (ArrayList<BookRequest>) bookWithRequests.get(subListAdapter.getBook()));
+//      bookWithRequests.forEach((key, value) -> {});
+      subListAdapter.notifyDataSetChanged();
     }
   }
 }
