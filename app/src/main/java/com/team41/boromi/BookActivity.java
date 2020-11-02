@@ -19,9 +19,14 @@ import com.team41.boromi.book.MapFragment;
 import com.team41.boromi.book.OwnedFragment;
 import com.team41.boromi.book.SearchFragment;
 import com.team41.boromi.book.SettingsFragment;
+import com.team41.boromi.models.Book;
+import java.util.ArrayList;
 
 public class BookActivity extends AppCompatActivity {
 
+  private static final String LAYOUT_PARAM1 = "LayoutID";
+  private static final String DATA_PARAM2 = "Data";
+  private static final String MSG_PARAM3 = "Msg";
   private ViewPager2 viewPager2;
   private PagerAdapter pagerAdapter;
   private TabLayout tabLayout;
@@ -96,5 +101,14 @@ public class BookActivity extends AppCompatActivity {
       default:
         return super.onOptionsItemSelected(item);
     }
+  }
+
+
+  public Bundle setupBundle(int layout, ArrayList<Book> data, String messsge) {
+    Bundle bundle = new Bundle();
+    bundle.putInt(LAYOUT_PARAM1, layout);
+    bundle.putSerializable(DATA_PARAM2, data);
+    bundle.putString(MSG_PARAM3, messsge);
+    return bundle;
   }
 }

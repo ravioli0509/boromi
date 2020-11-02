@@ -11,8 +11,13 @@ import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener;
 import com.google.android.material.tabs.TabLayout.Tab;
+import com.team41.boromi.BookActivity;
 import com.team41.boromi.R;
 import com.team41.boromi.adapters.PagerAdapter;
+import com.team41.boromi.constants.CommonConstants.BookStatus;
+import com.team41.boromi.constants.CommonConstants.BookWorkflowStage;
+import com.team41.boromi.models.Book;
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass. Use the {@link BorrowedFragment#newInstance} factory method
@@ -23,6 +28,7 @@ public class BorrowedFragment extends Fragment {
   private TabLayout tabLayout;
   private ViewPager2 viewPager2;
   private PagerAdapter pagerAdapter;
+  private BookActivity bookActivity;
 
   public BorrowedFragment() {
     // Required empty public constructor
@@ -54,22 +60,44 @@ public class BorrowedFragment extends Fragment {
     View view = inflater.inflate(R.layout.fragment_borrowed, container, false);
     tabLayout = (TabLayout) view.findViewById(R.id.tabs_sub_borrowed);
     viewPager2 = view.findViewById(R.id.view_pager_borrowed);
+    bookActivity = (BookActivity) getActivity();
+
+    // TABS
     TabItem borrowedTab = (TabItem) view.findViewById(R.id.tabs_sub_borrowed_borrowed);
     TabItem requestedTab = (TabItem) view.findViewById(R.id.tabs_sub_borrowed_requested);
     TabItem acceptedTab = (TabItem) view.findViewById(R.id.tabs_sub_borrowed_accepted);
 
     // add fragments to tabs
+    ArrayList<Book> bookDataList = new ArrayList<>();
     pagerAdapter = new PagerAdapter(getChildFragmentManager(), getLifecycle());
-    Bundle bundle = new Bundle();
-    bundle.putString("msg", "These are all the books that you have borrowed currently");
+
+    Bundle bundle;
+    bookDataList.add(new Book("owner", "T21_1", "title", "123", BookStatus.AVAILABLE,
+        BookWorkflowStage.AVAILABLE, "borower"));
+    bookDataList.add(new Book("owner", "T21_2", "title", "123", BookStatus.AVAILABLE,
+        BookWorkflowStage.AVAILABLE, "borower"));
+    bundle = bookActivity.setupBundle(R.layout.borrowing, bookDataList,
+        "These are all the books that you have borrowed currently");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
-    bundle = new Bundle();
-    bundle.putString("msg", "These are all the books that you have requested to borrow");
+
+    bookDataList = new ArrayList<>();
+    bookDataList.add(new Book("owner", "T22_1", "title", "123", BookStatus.AVAILABLE,
+        BookWorkflowStage.AVAILABLE, "borower"));
+    bookDataList.add(new Book("owner", "T22_2", "title", "123", BookStatus.AVAILABLE,
+        BookWorkflowStage.AVAILABLE, "borower"));
+    bundle = bookActivity.setupBundle(R.layout.reqbm, bookDataList,
+        "These are all the books that you have requested to borrow");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
-    bundle = new Bundle();
-    bundle.putString("msg", "These are all the books that you have been accepted to borrow");
+
+    bookDataList = new ArrayList<>();
+    bookDataList.add(new Book("owner", "T23_1", "title", "123", BookStatus.AVAILABLE,
+        BookWorkflowStage.AVAILABLE, "borower"));
+    bookDataList.add(new Book("owner", "T23_2", "title", "123", BookStatus.AVAILABLE,
+        BookWorkflowStage.AVAILABLE, "borower"));
+    bundle = bookActivity.setupBundle(R.layout.accepted, bookDataList,
+        "These are all the books that you have been accepted to borrow");
     pagerAdapter.addFragment(
         new Pair<Class<? extends Fragment>, Bundle>(GenericListFragment.class, bundle));
 

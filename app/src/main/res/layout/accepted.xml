@@ -46,20 +46,20 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="The Hobbit"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textSize="20sp"></TextView>
+              android:id="@+id/accepted_title"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="The Hobbit"
+              android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+              android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/author"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="J.R.R. Tolkein"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:textSize="12sp"></TextView>
+              android:id="@+id/accepted_author"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="J.R.R. Tolkein"
+              android:textAppearance="@style/TextAppearance.AppCompat.Small"
+              android:textSize="12sp" />
 
             <LinearLayout
                 android:id="@+id/lent_to"
@@ -67,29 +67,29 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Giving to: "
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:textSize="10sp"></TextView>
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Giving to: "
+                  android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                  android:textSize="10sp" />
 
                 <TextView
-                    android:id="@+id/user"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="benlala8"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:textColor="#2196F3"
-                    android:textSize="10sp"></TextView>
+                  android:id="@+id/accepted_user"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="benlala8"
+                  android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                  android:textColor="#2196F3"
+                  android:textSize="10sp" />
             </LinearLayout>
 
             <TextView
-                android:id="@+id/isbn"
+                android:id="@+id/accepted_isbn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="ISBN: #1234567890123"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:textSize="10sp"></TextView>
+                android:textSize="10sp"/>
 
         </LinearLayout>
 
