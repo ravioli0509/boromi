@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.inject.Inject;
 
 public class BookActivity extends AppCompatActivity implements
@@ -238,6 +239,28 @@ public class BookActivity extends AppCompatActivity implements
 
       }
     });
+  }
+
+  public void updateFragment(String mainTab, String subTab) {
+    Optional<Fragment> f = getSupportFragmentManager().getFragments().stream().filter(fragment -> fragment.getClass().getSimpleName().equals(mainTab)).findFirst();
+    if (f.isPresent()) {
+      if (mainTab.equals("OwnedFragment")){
+        OwnedFragment ownedFragment = OwnedFragment.class.cast(f.get());
+        Optional<Fragment> subFragment = ownedFragment.getChildFragmentManager().getFragments().stream().filter(fragment -> ((GenericListFragment) fragment).tag.equals(subTab)).findFirst();
+        if (subFragment.isPresent()) {
+          ownedFragment.getData(subTab,(GenericListFragment) subFragment.get());
+        }
+      } else if (mainTab.equals("BorrowedFragment")) {
+        BorrowedFragment borrowedFragment = BorrowedFragment.class.cast(f.get());
+        Optional<Fragment> subFragment = borrowedFragment.getChildFragmentManager().getFragments().stream().filter(fragment -> ((GenericListFragment) fragment).tag.equals(subTab)).findFirst();
+        if (subFragment.isPresent()) {
+          borrowedFragment.getData(subTab,(GenericListFragment) subFragment.get());
+        }
+      } else {
+        return;
+      }
+    }
+
   }
 
   @Override

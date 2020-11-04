@@ -87,6 +87,30 @@ public class BookDB {
     }
   }
 
+  public List<Book> getAcceptedWithBorrower(String borrower) {
+    final ArrayList<Book> availableBooks = new ArrayList<>();
+
+    QuerySnapshot res;
+
+    // Gets all books with the owner field equal to the uuid
+    try {
+      res = Tasks.await(
+          booksRef.whereEqualTo("borrower", borrower).whereEqualTo("status", status.ACCEPTED).get(),
+          DB_TIMEOUT,
+          TimeUnit.MILLISECONDS
+      );
+    } catch (Exception e) { // failed
+      Log.w(TAG, e.getCause());
+      return null;
+    }
+
+    for (DocumentSnapshot document : res.getDocuments()) {
+      availableBooks.add(document.toObject(Book.class));
+    }
+
+    return availableBooks;
+  }
+
   /**
    * Attempts to push a book to the database
    *

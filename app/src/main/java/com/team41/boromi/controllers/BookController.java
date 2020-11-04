@@ -16,6 +16,7 @@ import com.team41.boromi.models.User;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executor;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -361,6 +362,13 @@ public class BookController {
       Log.d(TAG, "This should never happen, confirmed book that wasn't your borrowed");
       throw new RuntimeException("Confirmed you received a book that isn't yours");
     }
+  }
+
+  public void getBooksOthersAccepted(BookCallback bookCallback) {
+    executor.execute(() -> {
+      List<Book> bookList = bookDB.getAcceptedWithBorrower(user.getUUID());
+      bookCallback.onSuccess((ArrayList<Book>) bookList);
+    });
   }
 
   /**

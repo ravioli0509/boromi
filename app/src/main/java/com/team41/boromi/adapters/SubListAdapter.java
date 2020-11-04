@@ -9,20 +9,27 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.team41.boromi.R;
+import com.team41.boromi.book.GenericListFragment;
+import com.team41.boromi.callbacks.BookRequestCallback;
 import com.team41.boromi.controllers.BookRequestController;
 import com.team41.boromi.models.Book;
 import com.team41.boromi.models.BookRequest;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHolder> {
 
   private ArrayList<BookRequest> usersRequested;
   private Book book;
   private BookRequestController bookRequestController;
+  private GenericListAdapter parentAdapter;
+  private final SubListAdapter _this = this;
 
-  public SubListAdapter(ArrayList<BookRequest> usersRequested, Book book, BookRequestController bookRequestController) {
+  public SubListAdapter(ArrayList<BookRequest> usersRequested, Book book, BookRequestController bookRequestController, GenericListAdapter parentAdapter) {
     this.book = book;
     this.bookRequestController = bookRequestController;
+    this.parentAdapter = parentAdapter;
 
     if (usersRequested == null) {
       this.usersRequested = new ArrayList<>();
@@ -46,10 +53,13 @@ public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHold
       @Override
       public void onClick(View view) {
         int idx = holder.getLayoutPosition();
-        bookRequestController.acceptBookRequest(usersRequested.get(idx));
-        // TODO destroy this entry
-        usersRequested = new ArrayList<>();
-        notifyDataSetChanged();
+        bookRequestController.acceptBookRequest(usersRequested.get(idx), new BookRequestCallback() {
+          @Override
+          public void onComplete(Map<Book, List<BookRequest>> bookWithRequests) {
+            usersRequested = new ArrayList<>();
+            parentAdapter.deleteBookRequest(book, _this);
+          }
+        });
       }
     });
 
@@ -92,5 +102,9 @@ public class SubListAdapter extends RecyclerView.Adapter<SubListAdapter.ViewHold
       super(itemView);
       user = itemView.findViewById(R.id.req_list_entry_user);
     }
+  }
+
+  public ArrayList<BookRequest> getUsersRequested() {
+    return this.usersRequested;
   }
 }

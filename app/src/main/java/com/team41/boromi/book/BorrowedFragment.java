@@ -139,28 +139,24 @@ public class BorrowedFragment extends Fragment {
     bookActivity.getBookRequestController().getRequestedBooks(new BookRequestCallback() {
       @Override
       public void onComplete(Map<Book, List<BookRequest>> bookWithRequests) {
-
+        fragment.updateData(bookWithRequests);
       }
     });
   }
 
   public void getBorrowedAccepted(GenericListFragment fragment) {
-    bookActivity.getBookController().getOwnedBooks(bookActivity.getUser().getUUID(),
-        new BookCallback() {
-          @Override
-          public void onSuccess(ArrayList<Book> books) {
-            bookActivity.getCollections().put("OwnedBooks", books);
-            bookActivity.getCollections().put("BorrowerAccepted", (ArrayList<Book>) books.stream()
-                .filter((book -> book.getStatus() == BookStatus.ACCEPTED))
-                .collect(Collectors.toList()));
-            fragment.updateData(bookActivity.getCollections().get("BorrowerAccepted"));
-          }
+    bookActivity.getBookController().getBooksOthersAccepted(new BookCallback() {
+      @Override
+      public void onSuccess(ArrayList<Book> books) {
+        bookActivity.getCollections().put("BorrowerAccepted", (ArrayList<Book>) books);
+        fragment.updateData(books);
+      }
 
-          @Override
-          public void onFailure(Exception e) {
+      @Override
+      public void onFailure(Exception e) {
 
-          }
-        });
+      }
+    });
   }
 
   public void getData(String tag, GenericListFragment fragment) {

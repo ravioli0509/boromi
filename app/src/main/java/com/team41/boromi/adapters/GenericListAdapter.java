@@ -9,7 +9,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver;
+import com.team41.boromi.BookActivity;
 import com.team41.boromi.R;
+import com.team41.boromi.book.GenericListFragment;
+import com.team41.boromi.book.OwnedFragment;
 import com.team41.boromi.controllers.BookController;
 import com.team41.boromi.controllers.BookRequestController;
 import com.team41.boromi.models.Book;
@@ -27,6 +31,7 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
   private ViewGroup parent;
   private Map<Book, List<BookRequest>> bookWithRequests;
   private ArrayList<SubListAdapter> subListAdapters;
+  private GenericListFragment genericListFragment;
 
   public GenericListAdapter(ArrayList<Book> books, int id, BookController bookController) {
     this.books = books;
@@ -35,13 +40,14 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
   }
 
   public GenericListAdapter(ArrayList<Book> books, Map<Book, List<BookRequest>> bookWithRequests,
-      int id, BookController bookController, BookRequestController bookRequestController) {
+      int id, BookController bookController, BookRequestController bookRequestController, GenericListFragment fragment) {
     this.books = books;
     this.bookWithRequests = bookWithRequests;
     subListAdapters = new ArrayList<>();
     resource = id;
     this.bookController = bookController;
     this.bookRequestController = bookRequestController;
+    this.genericListFragment = fragment;
   }
 
 
@@ -84,7 +90,7 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
       } else {
         requesters = (ArrayList<BookRequest>) bookWithRequests.get(book);
       }
-      SubListAdapter subListAdapter = new SubListAdapter(requesters, book, bookRequestController);
+      SubListAdapter subListAdapter = new SubListAdapter(requesters, book, bookRequestController, this);
       recyclerView.setLayoutManager(new LinearLayoutManager(parent.getContext()));
       recyclerView.setAdapter(subListAdapter);
       subListAdapters.add(subListAdapter);
@@ -112,6 +118,19 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
 //      bookWithRequests.forEach((key, value) -> {});
       subListAdapter.notifyDataSetChanged();
     }
+  }
+
+  public void deleteBookRequest(Book book, SubListAdapter subListAdapter) {
+    this.books.remove(book);
+    this.bookWithRequests.remove(book);
+    this.subListAdapters.remove(subListAdapter);
+    ((BookActivity) genericListFragment.getActivity()).runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        notifyDataSetChanged();
+        ((BookActivity) genericListFragment.getActivity()).updateFragment("OwnedFragment", "Accepted");
+      }
+    });
   }
 
   public static class ViewHolder extends RecyclerView.ViewHolder {

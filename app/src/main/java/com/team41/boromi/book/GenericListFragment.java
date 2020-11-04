@@ -8,9 +8,11 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver;
 import com.team41.boromi.BookActivity;
 import com.team41.boromi.R;
 import com.team41.boromi.adapters.GenericListAdapter;
+import com.team41.boromi.adapters.SubListAdapter;
 import com.team41.boromi.models.Book;
 import com.team41.boromi.models.BookRequest;
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ public class GenericListFragment extends Fragment {
   private String tempMsg;
   private String parent;
   private Map<Book, List<BookRequest>> bookWithRequests;
+  private final GenericListFragment _this = this;
 
   public GenericListFragment() {
     // Required empty public constructor
@@ -79,12 +82,11 @@ public class GenericListFragment extends Fragment {
     recyclerView = view.findViewById(R.id.generic_list);
 //    recyclerView.setHasFixedSize(true);
     listAdapter = new GenericListAdapter(bookDataList, bookWithRequests, layoutID,
-        ((BookActivity) getActivity()).getBookController(), ((BookActivity) getActivity()).getBookRequestController());
+        ((BookActivity) getActivity()).getBookController(), ((BookActivity) getActivity()).getBookRequestController(), this);
     System.out.println(tempMsg);
     System.out.println(getTag());
     recyclerView.setAdapter(listAdapter);
     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
     tempMsgView.setText(tempMsg);
     if (parent.equals("Owned")) {
       ((OwnedFragment) getParentFragment()).getData(tag, this);
@@ -120,4 +122,7 @@ public class GenericListFragment extends Fragment {
     });
   }
 
+  public String getParent() {
+    return parent;
+  }
 }
