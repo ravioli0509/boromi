@@ -38,7 +38,7 @@ public class OwnedFragment extends Fragment {
   private PagerAdapter pagerAdapter;
   private BookActivity bookActivity;
   private String parent = "Owned";
-  private String TAG = "OwenedFrag";
+  private String TAG = "OwnedFrag";
 
   public OwnedFragment() {
     // Required empty public constructor

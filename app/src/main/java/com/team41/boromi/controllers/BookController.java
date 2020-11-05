@@ -392,6 +392,11 @@ public class BookController {
   }
 
   public String encodeToBase64(Bitmap bmap) {
+
+    if (bmap == null) {
+      return null;
+    }
+
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
     bmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
     String base64img = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
