@@ -423,4 +423,27 @@ public class BookController {
       bookDB.pushBook(book);
     });
   }
+
+  /**
+   * This method returns a list of books that the user is borrowing from other owners.
+   * @param username
+   * @param bookCallback
+   */
+  public void getOwnerBorrowingBooks(String username, final BookCallback bookCallback) {
+    if (isNotNullOrEmpty(username)) {
+      executor.execute(() -> {
+        ArrayList<Book> borrowingBooks = bookDB.getOwnerBorrowingBooks(username);
+        if (borrowingBooks != null) {
+          Log.d(TAG, "Success getting user borrowing books");
+          bookCallback.onSuccess(borrowingBooks);
+        } else {
+          bookCallback.onFailure(new IllegalArgumentException());
+        }
+      });
+    } else {
+      Log.d(TAG, "Owner input is missing or null");
+      bookCallback.onFailure(new IllegalArgumentException());
+    }
+  }
+
 }

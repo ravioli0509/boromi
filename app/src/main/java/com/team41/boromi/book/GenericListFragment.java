@@ -30,9 +30,11 @@ public class GenericListFragment extends Fragment {
   private static final String MSG_PARAM3 = "Msg";
   private static final String PARENT_PARAM4 = "Parent";
   private static final String TAG_PARAM5 = "TAG";
+  private static final String TAG = "GenericListFrag";
   public String tag;
   RecyclerView recyclerView;
   GenericListAdapter listAdapter;
+  EditBookFragment editBookFragment;
   private ArrayList<Book> bookDataList = new ArrayList<>();
   private int layoutID;
   // TODO: Rename and change types of parameters
@@ -67,8 +69,9 @@ public class GenericListFragment extends Fragment {
       parent = getArguments().getString(PARENT_PARAM4);
       tag = getArguments().getString(TAG_PARAM5);
     }
-
   }
+
+  public String getParent(){ return parent; }
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,7 +82,7 @@ public class GenericListFragment extends Fragment {
     recyclerView = view.findViewById(R.id.generic_list);
 //    recyclerView.setHasFixedSize(true);
     listAdapter = new GenericListAdapter(bookDataList, bookWithRequests, layoutID,
-        ((BookActivity) getActivity()).getBookController());
+        ((BookActivity) getActivity()).getBookController(), this);
     System.out.println(tempMsg);
     System.out.println(getTag());
     recyclerView.setAdapter(listAdapter);
@@ -119,5 +122,7 @@ public class GenericListFragment extends Fragment {
       }
     });
   }
+
+
 
 }

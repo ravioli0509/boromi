@@ -62,10 +62,6 @@ public class SearchFragment extends Fragment {
         BookWorkflowStage.AVAILABLE, "borower"));
     searchResults.add(new Book("owner", "T11_2", "title", "123", BookStatus.AVAILABLE,
         BookWorkflowStage.AVAILABLE, "borower"));
-    listAdapter = new GenericListAdapter(searchResults, R.layout.searched,
-        bookActivity.getBookController());
-    recyclerView.setAdapter(listAdapter);
-    recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     return view;
   }
 }

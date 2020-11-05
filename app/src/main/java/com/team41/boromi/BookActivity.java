@@ -3,6 +3,7 @@ package com.team41.boromi;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +22,7 @@ import com.team41.boromi.adapters.PagerAdapter;
 import com.team41.boromi.book.AddBookFragment;
 import com.team41.boromi.book.AddBookFragment.AddBookFragmentListener;
 import com.team41.boromi.book.BorrowedFragment;
+import com.team41.boromi.book.EditUserFragment.ChangesUserInformation;
 import com.team41.boromi.book.GenericListFragment;
 import com.team41.boromi.book.MapFragment;
 import com.team41.boromi.book.OwnedFragment;
@@ -37,9 +39,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import javax.inject.Inject;
 
-public class BookActivity extends AppCompatActivity implements AddBookFragmentListener {
+public class BookActivity extends AppCompatActivity implements
+        AddBookFragmentListener,
+        ChangesUserInformation {
 
   private static final String LAYOUT_PARAM1 = "LayoutID";
   private static final String DATA_PARAM2 = "Data";
@@ -235,4 +241,34 @@ public class BookActivity extends AppCompatActivity implements AddBookFragmentLi
       }
     });
   }
+
+  public void updateFragment(String mainTab, String subTab) {
+    Optional<Fragment> f = getSupportFragmentManager().getFragments().stream().filter(fragment -> fragment.getClass().getSimpleName().equals(mainTab)).findFirst();
+    if (f.isPresent()) {
+      if (mainTab.equals("OwnedFragment")){
+        OwnedFragment ownedFragment = OwnedFragment.class.cast(f.get());
+        Optional<Fragment> subFragment = ownedFragment.getChildFragmentManager().getFragments().stream().filter(fragment -> ((GenericListFragment) fragment).tag.equals(subTab)).findFirst();
+        if (subFragment.isPresent()) {
+          ownedFragment.getData(subTab,(GenericListFragment) subFragment.get());
+        }
+      } else if (mainTab.equals("BorrowedFragment")) {
+        BorrowedFragment borrowedFragment = BorrowedFragment.class.cast(f.get());
+        Optional<Fragment> subFragment = borrowedFragment.getChildFragmentManager().getFragments().stream().filter(fragment -> ((GenericListFragment) fragment).tag.equals(subTab)).findFirst();
+        if (subFragment.isPresent()) {
+          borrowedFragment.getData(subTab,(GenericListFragment) subFragment.get());
+        }
+      } else {
+        return;
+      }
+    }
+  }
+
+  @Override
+  public void changeUserInformation(String username,  String email) {
+    // Neither fields were change so do nothing
+    if (username.equals(this.user.getUsername()) && email.equals(this.user.getEmail())) {
+      return;
+    }
+  }
+
 }
