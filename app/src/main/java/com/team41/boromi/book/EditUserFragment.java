@@ -2,26 +2,27 @@ package com.team41.boromi.book;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.team41.boromi.BookActivity;
 import com.team41.boromi.R;
 import com.team41.boromi.models.User;
 
 public class EditUserFragment extends DialogFragment {
 	private TextInputEditText editTextUsername;
 	private TextInputEditText editTextEmail;
+	private Button buttonSaveChanges;
+
 	private ChangesUserInformation listener;
 
 	public interface ChangesUserInformation {
@@ -37,32 +38,23 @@ public class EditUserFragment extends DialogFragment {
 
 		editTextUsername = view.findViewById(R.id.edit_user_edit_text_username);
 		editTextEmail = view.findViewById(R.id.edit_user_edit_text_email);
+		buttonSaveChanges = view.findViewById(R.id.edit_user_button_save);
+
+		User user = ((BookActivity) getActivity()).getUser();
+		editTextUsername.setText(user.getUsername());
+		editTextEmail.setText(user.getEmail());
+
+		buttonSaveChanges.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				String username = editTextUsername.getText().toString();
+				String email = editTextEmail.getText().toString();
+				((SettingsFragment) getParentFragment()).changeUserInformation(username, email);
+				dismiss();
+			}
+		});
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-		return builder
-				.setView(view)
-				.setTitle("Edit Contact Information")
-				.setNegativeButton("Cancel", null)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						String username = editTextUsername.getText().toString();
-						String email = editTextEmail.getText().toString();
-						listener.changeUserInformation(username, email);
-					}
-				}).create();
-	}
-
-	@Override
-	public void onAttach(@NonNull Context context) {
-		super.onAttach(context);
-
-		if (context instanceof ChangesUserInformation) {
-			listener = (ChangesUserInformation) context;
-		} else {
-			throw new RuntimeException(
-					context.toString() + " Must Implement OnFragmentInteractionListener"
-			);
-		}
+		return builder.setView(view).create();
 	}
 }
