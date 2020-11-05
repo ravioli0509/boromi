@@ -228,16 +228,7 @@ public class BookActivity extends AppCompatActivity implements AddBookFragment.A
     bookController.addBook(author, isbn, title, image, new BookCallback() {
       @Override
       public void onSuccess(ArrayList<Book> books) {
-        for (Fragment f : getSupportFragmentManager().getFragments()) {
-          if (f.getClass().getSimpleName().equals("OwnedFragment")) {
-            for (Fragment fc : f.getChildFragmentManager().getFragments()) {
-              GenericListFragment gf = (GenericListFragment) fc;
-              if (gf.tag.equals("Available")) {
-                ((OwnedFragment) f).getData(gf.tag, gf);
-              }
-            }
-          }
-        }
+        updateFragment("OwnedFragment", "Available");
       }
 
       @Override

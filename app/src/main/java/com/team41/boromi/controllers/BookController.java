@@ -79,7 +79,9 @@ public class BookController {
       Book addingBook = new Book(user.getUUID(), title, author, ISBN);
       addingBook.setStatus(status.AVAILABLE);
       addingBook.setWorkflow(workflow.AVAILABLE);
-      addingBook.setImg64(encodeToBase64(image));
+      if (image != null) {
+        addingBook.setImg64(encodeToBase64(image));
+      }
       executor.execute(() -> {
         ArrayList<Book> addedBook = new ArrayList<>();
         addedBook.add(bookDB.pushBook(addingBook));

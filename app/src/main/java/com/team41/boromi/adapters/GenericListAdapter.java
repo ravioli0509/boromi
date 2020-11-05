@@ -80,6 +80,8 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
       Bitmap b = bookController.decodeBookImage(book);
       if (b != null) {
         holder.imageButton.setImageBitmap(b);
+      } else {
+        holder.imageButton.setImageResource(R.drawable.add_photo_icon);
       }
     }
     if (holder.reqom != null) {
