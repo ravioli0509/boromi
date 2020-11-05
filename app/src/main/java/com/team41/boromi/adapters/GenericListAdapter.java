@@ -97,7 +97,6 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
     return holder;
   }
 
-  @RequiresApi(api = Build.VERSION_CODES.Q)
   @Override
   public void onBindViewHolder(@NonNull GenericListAdapter.ViewHolder holder, int position) {
     Book book = books.get(position);
