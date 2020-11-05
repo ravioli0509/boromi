@@ -30,6 +30,7 @@ import com.team41.boromi.constants.CommonConstants.BookStatus;
 import com.team41.boromi.constants.CommonConstants.BookWorkflowStage;
 import com.team41.boromi.models.Book;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * A simple {@link Fragment} subclass. Use the {@link SearchFragment#newInstance} factory method to
@@ -77,7 +78,7 @@ public class SearchFragment extends Fragment {
     ImageButton search_butt = view.findViewById(R.id.search_butt);
     TextView Results = view.findViewById(R.id.results);
     searchResults = new ArrayList<>();
-    listAdapter = new GenericListAdapter(searchResults, R.layout.searched, bookActivity.getBookController(), bookActivity.getBookRequestController());
+    listAdapter = new GenericListAdapter(searchResults, R.layout.searched, (BookActivity) getActivity());
     recyclerView.setAdapter(listAdapter);
     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     search_butt.setOnClickListener(v -> {
@@ -85,16 +86,18 @@ public class SearchFragment extends Fragment {
       bookActivity.getBookController().findBooks(keywords, new BookCallback() {
         @Override
         public void onSuccess(ArrayList<Book> books) {
-            bookActivity.getCollections().put("Searched", books);
-            searchResults.clear();
-            searchResults.addAll(books);
-            getActivity().runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-                listAdapter.notifyDataSetChanged();
-                Results.setText("Results");
-              }
-            });
+          ArrayList<Book> filtered = (ArrayList<Book>) books.stream().filter(book -> !book.getOwner().equals(((BookActivity)getActivity()).getUser().getUUID())).collect(Collectors.toList());
+          bookActivity.getCollections().put("Searched", filtered);
+
+          searchResults.clear();
+          searchResults.addAll(filtered);
+          getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              listAdapter.notifyDataSetChanged();
+              Results.setText("Results");
+            }
+          });
         }
 
         @Override
