@@ -6,8 +6,10 @@ import static com.team41.boromi.utility.Utility.isNotNullOrEmpty;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -50,18 +52,28 @@ public class EditBookFragment extends DialogFragment {
     }
 
     @Override
+    public void onResume(){
+        super.onResume();
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         editBook = (Button) view.findViewById(R.id.edit_book_add_button);
         author = (EditText) view.findViewById(R.id.edit_book_author);
         title = (EditText) view.findViewById(R.id.edit_book_title);
         isbn = (EditText) view.findViewById(R.id.edit_book_isbn);
-        addImage = (ImageButton) view.findViewById(R.id.edit_book_image);
+        addImage = (ImageButton) view.findViewById(R.id.edit_book_book_image);
 
         author.setText(editingBook.getAuthor());
         title.setText(editingBook.getTitle());
-//        addImage.setImageBitmap(editingBook.getImg64()); // decode to image
         isbn.setText(editingBook.getISBN());
+
+        if (editingBook.getImg64() != null ){
+            byte [] imageStrings = Base64.decode(editingBook.getImg64(), Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(imageStrings, 0, imageStrings.length);
+            addImage.setImageBitmap(bitmap); // decode to image
+        }
 
         editBook.setOnClickListener(view1 -> {
             String author_text = author.getText().toString();
@@ -69,19 +81,27 @@ public class EditBookFragment extends DialogFragment {
             String isbn_text = isbn.getText().toString();
             EditBookFragmentListener listener = (EditBookFragmentListener) getActivity();
             if (isNotNullOrEmpty(author_text) && isNotNullOrEmpty(title_text) && isNotNullOrEmpty(isbn_text)) {
-                listener.onComplete(author_text, title_text, isbn_text, imageBitmap);
+                listener.onEditComplete(editingBook.getBookId(), author_text, title_text, isbn_text, imageBitmap);
                 dismiss();
             }
         });
-        addImage.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) { dispatchTakePictureIntent(); }
+
+        addImage.setOnClickListener(view2 -> dispatchTakePictureIntent());
+        addImage.setOnLongClickListener(view3 -> {
+            addImage.setImageResource(R.drawable.add_photo_icon);
+            this.imageBitmap = null;
+            return true;
         });
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == -1) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            addImage.setImageBitmap(imageBitmap);
+            this.imageBitmap = imageBitmap;
+        }
     }
 
     private void dispatchTakePictureIntent() {
@@ -94,6 +114,6 @@ public class EditBookFragment extends DialogFragment {
     }
 
     public interface EditBookFragmentListener {
-        void onComplete(String author, String title, String isbn, Bitmap image);
+        void onEditComplete(String BookID, String author, String title, String isbn, Bitmap image);
     }
 }

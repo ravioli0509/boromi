@@ -34,7 +34,6 @@ public class GenericListFragment extends Fragment {
   public String tag;
   RecyclerView recyclerView;
   GenericListAdapter listAdapter;
-  EditBookFragment editBookFragment;
   private ArrayList<Book> bookDataList = new ArrayList<>();
   private int layoutID;
   // TODO: Rename and change types of parameters
@@ -82,7 +81,7 @@ public class GenericListFragment extends Fragment {
     recyclerView = view.findViewById(R.id.generic_list);
 //    recyclerView.setHasFixedSize(true);
     listAdapter = new GenericListAdapter(bookDataList, bookWithRequests, layoutID,
-        ((BookActivity) getActivity()).getBookController(), this);
+        ((BookActivity) getActivity()).getBookController(), ((BookActivity) getActivity()).getBookRequestController(), this);
     System.out.println(tempMsg);
     System.out.println(getTag());
     recyclerView.setAdapter(listAdapter);

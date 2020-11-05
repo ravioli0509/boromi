@@ -26,6 +26,7 @@ import com.team41.boromi.R;
 import com.team41.boromi.book.EditBookFragment;
 import com.team41.boromi.book.GenericListFragment;
 import com.team41.boromi.controllers.BookController;
+import com.team41.boromi.controllers.BookRequestController;
 import com.team41.boromi.models.Book;
 import com.team41.boromi.models.BookRequest;
 import com.team41.boromi.utility.CustomClickListener;
@@ -37,15 +38,14 @@ import java.util.Map;
 public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.ViewHolder> {
 
   BookController bookController;
+  BookRequestController bookRequestController;
   private ArrayList<Book> books;
   private int resource;
   private ViewGroup parent;
   private Map<Book, List<BookRequest>> bookWithRequests;
   private ArrayList<SubListAdapter> subListAdapters;
   GenericListFragment genericListFragment;
-  FragmentActivity editBookFragment;
   private static final String TAG = "Adapter Tag";
-//  private BookActivity bookActivity;
 
   public GenericListAdapter(ArrayList<Book> books, int id, BookController bookController,
                             GenericListFragment genericListFragment) {
@@ -56,14 +56,14 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
   }
 
   public GenericListAdapter(ArrayList<Book> books, Map<Book, List<BookRequest>> bookWithRequests,
-                            int id, BookController bookController,
-                            GenericListFragment genericListFragment) {
+      int id, BookController bookController, BookRequestController bookRequestController, GenericListFragment genericListFragment) {
     this.books = books;
     this.bookWithRequests = bookWithRequests;
     subListAdapters = new ArrayList<>();
     resource = id;
     this.bookController = bookController;
     this.genericListFragment = genericListFragment;
+    this.bookRequestController = bookRequestController;
   }
 
 
@@ -97,6 +97,8 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
       Bitmap b = bookController.decodeBookImage(book);
       if (b != null) {
         holder.imageButton.setImageBitmap(b);
+      } else {
+        holder.imageButton.setImageResource(R.drawable.add_photo_icon);
       }
     }
     if (holder.reqom != null) {
@@ -107,7 +109,7 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
       } else {
         requesters = (ArrayList<BookRequest>) bookWithRequests.get(book);
       }
-      SubListAdapter subListAdapter = new SubListAdapter(requesters, book);
+      SubListAdapter subListAdapter = new SubListAdapter(requesters, book, bookRequestController);
       recyclerView.setLayoutManager(new LinearLayoutManager(parent.getContext()));
       recyclerView.setAdapter(subListAdapter);
       subListAdapters.add(subListAdapter);
@@ -203,7 +205,6 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
           title = itemView.findViewById(R.id.reqom_title);
           author = itemView.findViewById(R.id.reqom_author);
           isbn = itemView.findViewById(R.id.reqom_isbn);
-          user = itemView.findViewById(R.id.reqom_user);
           reqom = itemView.findViewById(R.id.reqom_request_list);
           imageButton = itemView.findViewById(R.id.reqom_book_image);
           rightButton = null;

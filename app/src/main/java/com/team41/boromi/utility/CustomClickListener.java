@@ -22,11 +22,10 @@ import com.team41.boromi.models.Book;
 import java.util.ArrayList;
 
 
-public class CustomClickListener implements View.OnClickListener, PopupMenu.OnMenuItemClickListener, EditBookFragment.EditBookFragmentListener {
+public class CustomClickListener implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
     Book book;
     BookController bookController;
     GenericListFragment genericListFragment;
-    FragmentActivity editBookFragment;
 
     public CustomClickListener(Book book, BookController bookController, GenericListFragment genericListFragment) {
         this.book = book;
@@ -49,9 +48,9 @@ public class CustomClickListener implements View.OnClickListener, PopupMenu.OnMe
         switch (menuItem.getItemId()) {
             case R.id.edit_book:
                 Log.d("edit!", book.getTitle());
-                FragmentManager fragmentManager = editBookFragment.getSupportFragmentManager();
-                EditBookFragment editBookFragment = EditBookFragment.newInstance(book);
-                editBookFragment.show(fragmentManager, "editBook");
+                FragmentManager fragmentManager = (genericListFragment.getActivity()).getSupportFragmentManager();
+                EditBookFragment showEditBookFragment = EditBookFragment.newInstance(book);
+                showEditBookFragment.show(fragmentManager, "editBook");
 
                 return true;
             case R.id.delete_book:
@@ -59,30 +58,20 @@ public class CustomClickListener implements View.OnClickListener, PopupMenu.OnMe
                 bookController.deleteBook(book.getBookId(), new BookCallback() {
                     @Override
                     public void onSuccess(ArrayList<Book> books) {
-                        genericListFragment.getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (genericListFragment.getParent().equals("Owned")) {
-                                    ((BookActivity) genericListFragment.getActivity()).updateFragment("OwnedFragment", genericListFragment.tag);
-                                } else if (genericListFragment.getParent().equals("Borrowed")) {
-                                    ((BookActivity) genericListFragment.getActivity()).updateFragment("BorrowedFragment", genericListFragment.tag);
-                                }
+                        genericListFragment.getActivity().runOnUiThread(() -> {
+                            if (genericListFragment.getParent().equals("Owned")) {
+                                ((BookActivity) genericListFragment.getActivity()).updateFragment("OwnedFragment", genericListFragment.tag);
+                            } else if (genericListFragment.getParent().equals("Borrowed")) {
+                                ((BookActivity) genericListFragment.getActivity()).updateFragment("BorrowedFragment", genericListFragment.tag);
                             }
                         });
                     }
-
                     @Override
-                    public void onFailure(Exception e) {
-
-                    }
+                    public void onFailure(Exception e) { }
                 });
 
         }
         return false;
     }
 
-    @Override
-    public void onComplete(String author, String title, String isbn, Bitmap image) {
-
-    }
 }

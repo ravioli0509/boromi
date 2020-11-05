@@ -7,6 +7,7 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,24 +15,26 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
+
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener;
 import com.google.android.material.tabs.TabLayout.Tab;
 import com.team41.boromi.adapters.PagerAdapter;
 import com.team41.boromi.book.AddBookFragment;
-import com.team41.boromi.book.AddBookFragment.AddBookFragmentListener;
 import com.team41.boromi.book.BorrowedFragment;
-import com.team41.boromi.book.EditUserFragment.ChangesUserInformation;
+import com.team41.boromi.book.EditBookFragment;
 import com.team41.boromi.book.GenericListFragment;
 import com.team41.boromi.book.MapFragment;
 import com.team41.boromi.book.OwnedFragment;
 import com.team41.boromi.book.SearchFragment;
 import com.team41.boromi.book.SettingsFragment;
 import com.team41.boromi.callbacks.BookCallback;
+import com.team41.boromi.controllers.AuthenticationController;
 import com.team41.boromi.controllers.BookController;
 import com.team41.boromi.controllers.BookRequestController;
 import com.team41.boromi.controllers.BookReturnController;
+import com.team41.boromi.dagger.BoromiModule;
 import com.team41.boromi.models.Book;
 import com.team41.boromi.models.BookRequest;
 import com.team41.boromi.models.User;
@@ -40,12 +43,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import com.team41.boromi.models.Book;
+import java.util.ArrayList;
 
-public class BookActivity extends AppCompatActivity implements
-        AddBookFragmentListener,
-        ChangesUserInformation {
+public class BookActivity extends AppCompatActivity implements AddBookFragment.AddBookFragmentListener, EditBookFragment.EditBookFragmentListener {
 
   private static final String LAYOUT_PARAM1 = "LayoutID";
   private static final String DATA_PARAM2 = "Data";
@@ -78,6 +82,9 @@ public class BookActivity extends AppCompatActivity implements
     pagerAdapter = new PagerAdapter(getSupportFragmentManager(), getLifecycle());
     Toolbar toolbar = (Toolbar) findViewById(R.id.book_toolbar);
     setSupportActionBar(toolbar);
+
+    // Prevents the keyboard from moving the entire screen up
+    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
     tabLayout = findViewById(R.id.tabs_main);
     viewPager2 = findViewById(R.id.view_pager_main);
@@ -217,7 +224,6 @@ public class BookActivity extends AppCompatActivity implements
   protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
   }
-
   @Override
   public void onComplete(String author, String title, String isbn, Bitmap image) {
     bookController.addBook(author, isbn, title, image, new BookCallback() {
@@ -242,6 +248,32 @@ public class BookActivity extends AppCompatActivity implements
     });
   }
 
+  @Override
+  public void onEditComplete(String BookID, String author, String title, String isbn, Bitmap image){
+    bookController.editBook(BookID, author, isbn, title, image, new BookCallback() {
+      @Override
+      public void onSuccess(ArrayList<Book> books) {
+        for (Fragment f : getSupportFragmentManager().getFragments()) {
+          if (f.getClass().getSimpleName().equals("OwnedFragment")) {
+            for (Fragment fc : f.getChildFragmentManager().getFragments()) {
+              GenericListFragment gf = (GenericListFragment) fc;
+              if (gf.tag.equals("Available")) {
+                ((OwnedFragment) f).getData(gf.tag, gf);
+              }
+            }
+          }
+        }
+      }
+
+      @Override
+      public void onFailure(Exception e) {
+        Log.d("fuck", "ahdahda");
+      }
+    });
+  }
+
+
+
   public void updateFragment(String mainTab, String subTab) {
     Optional<Fragment> f = getSupportFragmentManager().getFragments().stream().filter(fragment -> fragment.getClass().getSimpleName().equals(mainTab)).findFirst();
     if (f.isPresent()) {
@@ -260,14 +292,6 @@ public class BookActivity extends AppCompatActivity implements
       } else {
         return;
       }
-    }
-  }
-
-  @Override
-  public void changeUserInformation(String username,  String email) {
-    // Neither fields were change so do nothing
-    if (username.equals(this.user.getUsername()) && email.equals(this.user.getEmail())) {
-      return;
     }
   }
 

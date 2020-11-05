@@ -78,7 +78,9 @@ public class BookController {
       Book addingBook = new Book(user.getUUID(), title, author, ISBN);
       addingBook.setStatus(status.AVAILABLE);
       addingBook.setWorkflow(workflow.AVAILABLE);
-      addingBook.setImg64(encodeToBase64(image));
+      if (image != null){
+        addingBook.setImg64(encodeToBase64(image));
+      }
       executor.execute(() -> {
         ArrayList<Book> addedBook = new ArrayList<>();
         addedBook.add(bookDB.pushBook(addingBook));
@@ -106,7 +108,9 @@ public class BookController {
       Book addingBook = new Book(user.getUUID(), title, author, ISBN);
       addingBook.setStatus(status.AVAILABLE);
       addingBook.setWorkflow(workflow.AVAILABLE);
-      addingBook.setImg64(image);
+      if (isNotNullOrEmpty(image)) {
+        addingBook.setImg64(image);
+      }
       executor.execute(() -> {
         ArrayList<Book> addedBook = new ArrayList<>();
         addedBook.add(bookDB.pushBook(addingBook));
@@ -133,7 +137,7 @@ public class BookController {
    * @param title
    * @return
    */
-  public void editBook(String bookID, String author, String ISBN, String title,
+  public void editBook(String bookID, String author, String ISBN, String title, Bitmap image,
       final BookCallback bookCallback) {
     if (isNotNullOrEmpty(author) && isNotNullOrEmpty(ISBN) && isNotNullOrEmpty(title)) {
       executor.execute(() -> {
@@ -143,6 +147,11 @@ public class BookController {
           editingBook.setTitle(title);
           editingBook.setAuthor(author);
           editingBook.setISBN(ISBN);
+          if (image != null) {
+            editingBook.setImg64(encodeToBase64(image));
+          } else {
+            editingBook.setImg64(null);
+          }
           edited.add(bookDB.pushBook(editingBook));
           Log.d(TAG, " book edit success");
 
