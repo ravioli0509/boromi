@@ -268,7 +268,6 @@ public class BookActivity extends AppCompatActivity implements AddBookFragment.A
 
       @Override
       public void onFailure(Exception e) {
-        Log.d("fuck", "ahdahda");
       }
     });
   }
