@@ -32,6 +32,7 @@ public class GenericListFragment extends Fragment {
   private static final String MSG_PARAM3 = "Msg";
   private static final String PARENT_PARAM4 = "Parent";
   private static final String TAG_PARAM5 = "TAG";
+  private static final String TAG = "GenericListFrag";
   public String tag;
   RecyclerView recyclerView;
   GenericListAdapter listAdapter;
@@ -70,8 +71,9 @@ public class GenericListFragment extends Fragment {
       parent = getArguments().getString(PARENT_PARAM4);
       tag = getArguments().getString(TAG_PARAM5);
     }
-
   }
+
+  public String getParent(){ return parent; }
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -120,9 +122,5 @@ public class GenericListFragment extends Fragment {
         listAdapter.notifySubAdapters();
       }
     });
-  }
-
-  public String getParent() {
-    return parent;
   }
 }

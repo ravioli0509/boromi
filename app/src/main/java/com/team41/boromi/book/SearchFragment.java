@@ -28,7 +28,11 @@ import com.team41.boromi.adapters.GenericListAdapter;
 import com.team41.boromi.callbacks.BookCallback;
 import com.team41.boromi.constants.CommonConstants.BookStatus;
 import com.team41.boromi.constants.CommonConstants.BookWorkflowStage;
+import com.team41.boromi.controllers.BookRequestController;
 import com.team41.boromi.models.Book;
+import com.team41.boromi.models.BookRequest;
+import com.team41.boromi.book.GenericListFragment;
+
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -42,6 +46,8 @@ public class SearchFragment extends Fragment {
   GenericListAdapter listAdapter;
   ArrayList<Book> searchResults;
   private BookActivity bookActivity;
+  private GenericListFragment genericListFragment;
+//  private BookRequestController bookRequestController;
 
   public SearchFragment() {
     // Required empty public constructor
