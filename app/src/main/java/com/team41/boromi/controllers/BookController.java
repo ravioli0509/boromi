@@ -448,6 +448,7 @@ public class BookController {
 
   /**
    * This method returns a list of books that the user is borrowing from other owners.
+   *
    * @param username
    * @param bookCallback
    */

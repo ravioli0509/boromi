@@ -8,11 +8,9 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver;
 import com.team41.boromi.BookActivity;
 import com.team41.boromi.R;
 import com.team41.boromi.adapters.GenericListAdapter;
-import com.team41.boromi.adapters.SubListAdapter;
 import com.team41.boromi.models.Book;
 import com.team41.boromi.models.BookRequest;
 import java.util.ArrayList;
@@ -33,16 +31,15 @@ public class GenericListFragment extends Fragment {
   private static final String PARENT_PARAM4 = "Parent";
   private static final String TAG_PARAM5 = "TAG";
   private static final String TAG = "GenericListFrag";
+  private final GenericListFragment _this = this;
   public String tag;
   RecyclerView recyclerView;
   GenericListAdapter listAdapter;
   private ArrayList<Book> bookDataList = new ArrayList<>();
   private int layoutID;
-  // TODO: Rename and change types of parameters
   private String tempMsg;
   private String parent;
   private Map<Book, List<BookRequest>> bookWithRequests;
-  private final GenericListFragment _this = this;
 
   public GenericListFragment() {
     // Required empty public constructor
@@ -73,7 +70,9 @@ public class GenericListFragment extends Fragment {
     }
   }
 
-  public String getParent(){ return parent; }
+  public String getParent() {
+    return parent;
+  }
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,11 +81,8 @@ public class GenericListFragment extends Fragment {
     View view = inflater.inflate(R.layout.fragment_generic_list, container, false);
     TextView tempMsgView = view.findViewById(R.id.tempMessage);
     recyclerView = view.findViewById(R.id.generic_list);
-//    recyclerView.setHasFixedSize(true);
     listAdapter = new GenericListAdapter(bookDataList, bookWithRequests, layoutID,
         (BookActivity) getActivity(), this);
-    System.out.println(tempMsg);
-    System.out.println(getTag());
     recyclerView.setAdapter(listAdapter);
     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     tempMsgView.setText(tempMsg);
@@ -110,7 +106,6 @@ public class GenericListFragment extends Fragment {
   }
 
   public void updateData(Map<Book, List<BookRequest>> bookWithRequests) {
-//    this.bookWithRequests.clear();
     this.bookDataList.clear();
     this.bookDataList.addAll(bookWithRequests.keySet());
     this.bookWithRequests = bookWithRequests;

@@ -1,49 +1,31 @@
 package com.team41.boromi.adapters;
 
-import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
-import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.team41.boromi.BookActivity;
-import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver;
 import com.team41.boromi.BookActivity;
 import com.team41.boromi.R;
-import com.team41.boromi.book.EditBookFragment;
 import com.team41.boromi.book.GenericListFragment;
-import com.team41.boromi.book.GenericListFragment;
-import com.team41.boromi.book.OwnedFragment;
 import com.team41.boromi.controllers.BookController;
 import com.team41.boromi.controllers.BookRequestController;
 import com.team41.boromi.models.Book;
 import com.team41.boromi.models.BookRequest;
 import com.team41.boromi.utility.CustomClickListener;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.ViewHolder> {
 
+  private static final String TAG = "Adapter Tag";
   BookController bookController;
   BookRequestController bookRequestController;
   private ArrayList<Book> books;
@@ -53,12 +35,11 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
   private ArrayList<SubListAdapter> subListAdapters;
   private GenericListFragment genericListFragment;
   private BookActivity bookActivity;
-  private static final String TAG = "Adapter Tag";
 
   public GenericListAdapter(ArrayList<Book> books, int id, BookController bookController,
-                            GenericListFragment genericListFragment) {
+      GenericListFragment genericListFragment) {
     this.books = books;
-    resource = id;
+    this.resource = id;
     this.bookController = bookController;
     this.genericListFragment = genericListFragment;
   }
@@ -66,7 +47,7 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
   public GenericListAdapter(ArrayList<Book> books, int id, BookActivity bookActivity) {
     this.bookActivity = bookActivity;
     this.books = books;
-    resource = id;
+    this.resource = id;
     this.bookController = bookActivity.getBookController();
     this.bookRequestController = bookActivity.getBookRequestController();
   }
@@ -76,8 +57,8 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
     this.bookActivity = bookActivity;
     this.books = books;
     this.bookWithRequests = bookWithRequests;
-    subListAdapters = new ArrayList<>();
-    resource = id;
+    this.subListAdapters = new ArrayList<>();
+    this.resource = id;
     this.bookController = bookActivity.getBookController();
     this.bookRequestController = bookActivity.getBookRequestController();
     this.genericListFragment = fragment;
@@ -89,19 +70,19 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
   public GenericListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     View view = LayoutInflater.from(parent.getContext()).inflate(resource, parent, false);
     ViewHolder holder = new ViewHolder(view, resource);
-    if (holder.request_button != null){
-      holder.request_button.setOnClickListener(new View.OnClickListener(){
+    this.parent = parent;
+    if (holder.request_button != null) {
+      holder.request_button.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-         int pos = holder.getLayoutPosition();
-         if (pos == -1) {
-           return;
-         }
-         Book requested = books.get(pos);
-         bookRequestController.makeRequestOnBook(requested);
-         books.remove(requested);
-         bookActivity.updateFragment("BorrowedFragment", "Requested");
-         notifyDataSetChanged();
+          int pos = holder.getAdapterPosition();
+          if (pos != RecyclerView.NO_POSITION) {
+            Book requested = books.get(pos);
+            bookRequestController.makeRequestOnBook(requested);
+            books.remove(requested);
+            bookActivity.updateFragment("BorrowedFragment", "Requested");
+            notifyDataSetChanged();
+          }
         }
       });
     }
@@ -109,19 +90,17 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
       holder.withdrawButton.setOnClickListener(new OnClickListener() {
         @Override
         public void onClick(View view) {
-          int pos = holder.getLayoutPosition();
-          if (pos == -1) {
-            return;
+          int pos = holder.getAdapterPosition();
+          if (pos != RecyclerView.NO_POSITION) {
+            Book requested = books.get(pos);
+            bookRequestController.declineBookRequest(bookWithRequests.get(requested).get(0));
+            books.remove(requested);
+            bookWithRequests.remove(requested);
+            notifyDataSetChanged();
           }
-          Book requested = books.get(pos);
-          bookRequestController.declineBookRequest(bookWithRequests.get(requested).get(0));
-          books.remove(requested);
-          bookWithRequests.remove(requested);
-          notifyDataSetChanged();
         }
       });
     }
-    this.parent = parent;
     return holder;
   }
 
@@ -161,13 +140,15 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
       } else {
         requesters = (ArrayList<BookRequest>) bookWithRequests.get(book);
       }
-      SubListAdapter subListAdapter = new SubListAdapter(requesters, book, bookRequestController, this);
+      SubListAdapter subListAdapter = new SubListAdapter(requesters, book, bookRequestController,
+          this);
       recyclerView.setLayoutManager(new LinearLayoutManager(parent.getContext()));
       recyclerView.setAdapter(subListAdapter);
       subListAdapters.add(subListAdapter);
     }
     if (holder.rightButton != null) {
-      holder.rightButton.setOnClickListener(new CustomClickListener(book, bookController, genericListFragment));
+      holder.rightButton
+          .setOnClickListener(new CustomClickListener(book, bookController, genericListFragment));
     }
   }
 
@@ -189,7 +170,6 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
     for (SubListAdapter subListAdapter : subListAdapters) {
       subListAdapter.setUsersRequested(
           (ArrayList<BookRequest>) bookWithRequests.get(subListAdapter.getBook()));
-//      bookWithRequests.forEach((key, value) -> {});
       subListAdapter.notifyDataSetChanged();
     }
   }
@@ -202,7 +182,8 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
       @Override
       public void run() {
         notifyDataSetChanged();
-        ((BookActivity) genericListFragment.getActivity()).updateFragment("OwnedFragment", "Accepted");
+        ((BookActivity) genericListFragment.getActivity())
+            .updateFragment("OwnedFragment", "Accepted");
       }
     });
   }
@@ -230,7 +211,7 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
           isbn = itemView.findViewById(R.id.available_isbn);
           imageButton = itemView.findViewById(R.id.available_book_image);
           rightButton = itemView.findViewById(R.id.right_button);
-          request_button=null;
+          request_button = null;
           reqom = null;
           break;
         case (R.layout.accepted):
@@ -240,7 +221,7 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
           user = itemView.findViewById(R.id.accepted_user);
           imageButton = itemView.findViewById(R.id.accepted_book_image);
           rightButton = itemView.findViewById(R.id.right_button);
-          request_button=null;
+          request_button = null;
           reqom = null;
           break;
         case (R.layout.borrowing):
@@ -250,7 +231,7 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
           user = itemView.findViewById(R.id.borrowing_user);
           imageButton = itemView.findViewById(R.id.borrowing_book_image);
           rightButton = null;
-          request_button=null;
+          request_button = null;
           reqom = null;
           break;
         case (R.layout.lent):
@@ -260,7 +241,7 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
           user = itemView.findViewById(R.id.lent_user);
           imageButton = itemView.findViewById(R.id.lent_book_image);
           rightButton = itemView.findViewById(R.id.right_button);
-          request_button=null;
+          request_button = null;
           reqom = null;
           break;
         case (R.layout.reqbm):
@@ -271,7 +252,7 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
           imageButton = itemView.findViewById(R.id.reqbm_book_image);
           rightButton = null;
           withdrawButton = itemView.findViewById(R.id.reqbm_withdraw);
-          request_button=null;
+          request_button = null;
           reqom = null;
           break;
         case (R.layout.reqom):
@@ -281,7 +262,7 @@ public class GenericListAdapter extends RecyclerView.Adapter<GenericListAdapter.
           reqom = itemView.findViewById(R.id.reqom_request_list);
           imageButton = itemView.findViewById(R.id.reqom_book_image);
           rightButton = null;
-          request_button=null;
+          request_button = null;
           break;
         case (R.layout.searched):
           title = itemView.findViewById(R.id.searched_title);
