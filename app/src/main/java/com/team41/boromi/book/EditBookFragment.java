@@ -23,6 +23,8 @@ import androidx.fragment.app.DialogFragment;
 import com.team41.boromi.R;
 import com.team41.boromi.models.Book;
 
+import java.io.ByteArrayInputStream;
+
 
 public class EditBookFragment extends DialogFragment {
     private Button editBook;
@@ -70,8 +72,9 @@ public class EditBookFragment extends DialogFragment {
         isbn.setText(editingBook.getISBN());
 
         if (editingBook.getImg64() != null ){
-            byte [] imageStrings = Base64.decode(editingBook.getImg64(), Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(imageStrings, 0, imageStrings.length);
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
+                    Base64.decode(editingBook.getImg64(), Base64.DEFAULT));
+            Bitmap bitmap = BitmapFactory.decodeStream(byteArrayInputStream);
             addImage.setImageBitmap(bitmap); // decode to image
         }
 

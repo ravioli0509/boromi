@@ -3,6 +3,7 @@ package com.team41.boromi.utility;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.util.Log;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
@@ -19,6 +20,7 @@ import com.team41.boromi.callbacks.BookCallback;
 import com.team41.boromi.controllers.BookController;
 import com.team41.boromi.models.Book;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 
@@ -33,14 +35,21 @@ public class CustomClickListener implements View.OnClickListener, PopupMenu.OnMe
         this.genericListFragment = genericListFragment;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void onClick(View view) {
         PopupMenu popup = new PopupMenu(view.getContext(), view);
-        popup.setOnMenuItemClickListener(this::onMenuItemClick);
-        popup.inflate(R.menu.book_edit_delete_menu);
-        popup.setForceShowIcon(true);
-        popup.show();
+        try {
+            MenuInflater inflater = popup.getMenuInflater();
+            popup.setOnMenuItemClickListener(this::onMenuItemClick);
+            inflater.inflate(R.menu.book_edit_delete_menu, popup.getMenu());
+            Method method = popup.getMenu().getClass().getDeclaredMethod("setOptionalIconsVisible", boolean.class);
+            method.setAccessible(true);
+            popup.setOnMenuItemClickListener(this::onMenuItemClick);
+            method.invoke(popup.getMenu(), true);
+            popup.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
