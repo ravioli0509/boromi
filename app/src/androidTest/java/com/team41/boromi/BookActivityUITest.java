@@ -22,20 +22,21 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 
-public class ChangeTabUITest {
+public class BookActivityUITest {
 
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule
             = new ActivityScenarioRule<>(MainActivity.class);
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
         onView(withId(R.id.login_email))
                 .perform(typeText("rcravichan3@gmail.com"), closeSoftKeyboard());
         onView(withId(R.id.login_password))
                 .perform(typeText("supertest"), closeSoftKeyboard());
 
         onView(withId(R.id.login_login)).perform(click());
+        wait(5000);
     }
 
     @Test
