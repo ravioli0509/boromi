@@ -76,7 +76,6 @@ public class BookActivityUITest {
 
             }
         });
-        User superuser = new User("aPjWbp4MN7WG7RDZcnNCvBQg90J2", "BoromiSuperUser", "rcravichan3@gmail.com");
     }
 
     @Test
