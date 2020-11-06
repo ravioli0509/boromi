@@ -32,6 +32,7 @@ import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static com.team41.boromi.constants.CommonConstants.DB_TIMEOUT;
 
 @RunWith(AndroidJUnit4.class)
@@ -54,28 +55,47 @@ public class BookActivityUITest {
     AuthenticationController authController;
 
     @Rule
-    public ActivityScenarioRule<BookActivity> activityRule
-            = new ActivityScenarioRule<>(BookActivity.class);
+    public ActivityScenarioRule<MainActivity> activityRule
+            = new ActivityScenarioRule<>(MainActivity.class);
 
     @Before
     public void setup() throws InterruptedException {
-        authController = new AuthenticationController(userDB, auth, executor);
+//        authController = new AuthenticationController(userDB, auth, executor);
+//
+//        final Pair<String, String> emailAndPassword = new Pair<>(
+//                "rcravichan3@gmail.com",
+//                "supertest"
+//        );
+//        authController.makeLoginRequest(emailAndPassword.first, emailAndPassword.second, new AuthCallback() {
+//            @Override
+//            public void onSuccess(AuthResult authResult) {
+//                Log.d("Log in", "log in");
+//            }
+//
+//            @Override
+//            public void onFailure(Exception exception) {
+//
+//            }
+//        });
 
-        final Pair<String, String> emailAndPassword = new Pair<>(
-                "rcravichan3@gmail.com",
-                "supertest"
-        );
-        authController.makeLoginRequest(emailAndPassword.first, emailAndPassword.second, new AuthCallback() {
-            @Override
-            public void onSuccess(AuthResult authResult) {
-                Log.d("Log in", "log in");
-            }
+        onView(withId(R.id.welcome_login)).perform(click());
+        onView(withId(R.id.login_email))
+                .perform(typeText("rcravichan3@gmail.com"), closeSoftKeyboard());
+        onView(withId(R.id.login_password))
+                .perform(typeText("supertest"), closeSoftKeyboard());
 
-            @Override
-            public void onFailure(Exception exception) {
+        // Checks the contents of the email and password fields
+        onView(withId(R.id.login_email)).check(matches(withText("rcravichan3@gmail.com")));
+        onView(withId(R.id.login_password)).check(matches(withText("supertest")));
 
-            }
-        });
+        onView(withId(R.id.login_login)).perform(click());
+
+
+        // Validates that the loading spinner appears
+        onView(withId(R.id.login_loading)).check(matches(isDisplayed()));
+
+        Thread.sleep(5000);
+
     }
 
     @Test
@@ -174,6 +194,7 @@ public class BookActivityUITest {
 
         onView(withId(R.id.tabs_sub_owned_available)).perform(click());
         onView(withId(R.layout.available)).check(matches(isDisplayed()));
+
 
     }
 }
