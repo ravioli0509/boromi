@@ -1,6 +1,8 @@
 package com.team41.boromi.utility;
 
 import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,7 +18,9 @@ import com.team41.boromi.models.Book;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-
+/**
+ * This class is a listener for the more (...) button that appears on the cards.
+ */
 public class CustomClickListener implements View.OnClickListener,
     PopupMenu.OnMenuItemClickListener {
 
@@ -33,6 +37,10 @@ public class CustomClickListener implements View.OnClickListener,
     this.genericListFragment = genericListFragment;
   }
 
+  /**
+   * Expand the more button and show the dropdown menu
+   * @param view
+   */
   @Override
   public void onClick(View view) {
     PopupMenu popup = new PopupMenu(view.getContext(), view);
@@ -40,28 +48,47 @@ public class CustomClickListener implements View.OnClickListener,
       MenuInflater inflater = popup.getMenuInflater();
       popup.setOnMenuItemClickListener(this::onMenuItemClick);
       inflater.inflate(R.menu.book_edit_delete_menu, popup.getMenu());
-      if (genericListFragment.tag.equals("Accepted") && genericListFragment.getParent().equals("Owned")) {
-        MenuItem exchange = popup.getMenu().findItem(R.id.exchange_book);
-        exchange.setVisible(true);
-        exchange.setTitle("Give");
-      } else if (genericListFragment.tag.equals("Accepted") && genericListFragment.getParent().equals("Borrowed")) {
-        MenuItem exchange = popup.getMenu().findItem(R.id.exchange_book);
-        exchange.setVisible(true);
-        exchange.setTitle("Receive");
+      if (genericListFragment.getParent().equals("Owned")) {
+        MenuItem deleteBtn = popup.getMenu().findItem(R.id.delete_book);
+        deleteBtn.setVisible(true);
+        if (genericListFragment.tag.equals("Available")) {
+          MenuItem editBtn = popup.getMenu().findItem(R.id.edit_book);
+          editBtn.setVisible(true);
+        } else if (genericListFragment.tag.equals("Accepted")) {
+          MenuItem exchange = popup.getMenu().findItem(R.id.exchange_book);
+          exchange.setVisible(true);
+          exchange.setTitle("Give");
+        }
+      } else if (genericListFragment.getParent().equals("Borrowed")) {
+        if (genericListFragment.tag.equals("Accepted")) {
+          MenuItem exchange = popup.getMenu().findItem(R.id.exchange_book);
+          exchange.setVisible(true);
+          exchange.setTitle("Receive");
+        }
       } else {
+        popup.getMenu().findItem(R.id.delete_book).setVisible(false);
         popup.getMenu().findItem(R.id.exchange_book).setVisible(false);
+        popup.getMenu().findItem(R.id.edit_book).setVisible(false);
       }
       Method method = popup.getMenu().getClass()
           .getDeclaredMethod("setOptionalIconsVisible", boolean.class);
       method.setAccessible(true);
       popup.setOnMenuItemClickListener(this::onMenuItemClick);
       method.invoke(popup.getMenu(), true);
+
+      popup.setGravity(Gravity.END);
+
       popup.show();
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
 
+  /**
+   * onClick functionality for individual menu items
+   * @param menuItem
+   * @return
+   */
   @Override
   public boolean onMenuItemClick(MenuItem menuItem) {
     switch (menuItem.getItemId()) {

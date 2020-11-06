@@ -5,19 +5,21 @@
         android:layout_width="10dp"
         android:icon="@drawable/edit_icon"
         android:iconTint="@color/colorIconDark"
-        android:title="edit book" />
+        android:title="Edit Book"
+        android:visible="false"/>
 
     <item
         android:id="@+id/delete_book"
         android:layout_width="10dp"
         android:icon="@drawable/delete_icon"
         android:iconTint="@color/colorError"
-        android:title="delete book" />
+        android:title="Delete Book"
+        android:visible="false"/>
 
     <item
       android:id="@+id/exchange_book"
       android:layout_width="10dp"
-      android:icon="@drawable/delete_icon"
+      android:icon="@drawable/ic_baseline_autorenew_24"
       android:iconTint="@color/colorError"
       android:title="temp"
       android:visible="false"/>

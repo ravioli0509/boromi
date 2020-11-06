@@ -1,5 +1,8 @@
 package com.team41.boromi.utility;
 
+/**
+ * Utility class
+ */
 public abstract class Utility {
 
   /**
@@ -9,7 +12,7 @@ public abstract class Utility {
    * @return
    */
   public static boolean isNotNullOrEmpty(String str) {
-    if (!str.trim().isEmpty() && str != null) {
+    if (str != null && !str.trim().isEmpty()) {
       return true;
     }
     return false;

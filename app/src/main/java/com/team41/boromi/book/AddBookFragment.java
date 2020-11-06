@@ -17,17 +17,26 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import com.team41.boromi.R;
 
+/**
+ * AddBookFragment is DialogFragment that shows up when the add book button is pressed in the
+ * toolbar.
+ */
 public class AddBookFragment extends DialogFragment {
 
   private Button buttonAddBook;
   private EditText editTextAuthor;
   private EditText editTextTitle;
   private EditText editTextIsbn;
+  /**
+   * Used to validate input fields
+   */
   TextWatcher allFieldsWatcher = new TextWatcher() {
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -45,7 +54,7 @@ public class AddBookFragment extends DialogFragment {
           isNotNullOrEmpty(author) &&
               isNotNullOrEmpty(title) &&
               isNotNullOrEmpty(isbn)
-              && isbn.length() == 13
+              && returnIfISBNGood(isbn)
       );
     }
 
@@ -60,6 +69,10 @@ public class AddBookFragment extends DialogFragment {
   public AddBookFragment() {
   }
 
+  /**
+   * Factory method to create model
+   * @return
+   */
   public static AddBookFragment newInstance() {
     AddBookFragment addBookFragment = new AddBookFragment();
     Bundle args = new Bundle();
@@ -67,6 +80,13 @@ public class AddBookFragment extends DialogFragment {
     return addBookFragment;
   }
 
+  /**
+   * onCreateView to initialize any values
+   * @param inflater
+   * @param container
+   * @param savedInstanceState
+   * @return
+   */
   @Nullable
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -79,6 +99,11 @@ public class AddBookFragment extends DialogFragment {
     super.onResume();
   }
 
+  /**
+   * onViewCreated to bind any listeners or values
+   * @param view
+   * @param savedInstanceState
+   */
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
@@ -90,6 +115,9 @@ public class AddBookFragment extends DialogFragment {
 
     // Disables the button to start since the fields are all empty
     buttonAddBook.setEnabled(false);
+
+    // Makes the image rounded
+    addImage.setClipToOutline(true);
 
     // Adds listeners for all of the text fields
     editTextAuthor.addTextChangedListener(allFieldsWatcher);
@@ -119,16 +147,26 @@ public class AddBookFragment extends DialogFragment {
     });
   }
 
+  /**
+   * Returns from Camera Activity to attach a image to the book
+   * @param requestCode
+   * @param resultCode
+   * @param data
+   */
   @Override
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == -1) {
       Bundle extras = data.getExtras();
       Bitmap imageBitmap = (Bitmap) extras.get("data");
       addImage.setImageBitmap(imageBitmap);
+      addImage.setScaleType(ImageView.ScaleType.FIT_XY);
       this.imageBitmap = imageBitmap;
     }
   }
 
+  /**
+   * Used to start the Camera Activity to take a photo to attach to the book
+   */
   private void dispatchTakePictureIntent() {
     Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
     try {
@@ -138,8 +176,27 @@ public class AddBookFragment extends DialogFragment {
     }
   }
 
+  /**
+   * returns true if isbn is length 10 or 13.
+   * @param isbn
+   * @return
+   */
+  public boolean returnIfISBNGood(String isbn){
+    return isbn.length() == 13 || isbn.length() == 10;
+  }
+
+  /**
+   * Listener implemented in BookActivity that is called when AddBook button is pressed
+   */
   public interface AddBookFragmentListener {
 
+    /**
+     * onComplete called when addBook Button is clicked
+     * @param author author of the book
+     * @param title title of the book
+     * @param isbn isbn of the book
+     * @param image image of the book
+     */
     void onComplete(String author, String title, String isbn, Bitmap image);
   }
 }
