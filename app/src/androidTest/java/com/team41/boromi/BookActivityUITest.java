@@ -1,15 +1,29 @@
 package com.team41.boromi;
 
+import android.util.Log;
+import android.util.Pair;
+
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.team41.boromi.callbacks.AuthCallback;
 import com.team41.boromi.controllers.AuthenticationController;
+import com.team41.boromi.dbs.UserDB;
+import com.team41.boromi.models.User;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -18,29 +32,56 @@ import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static com.team41.boromi.constants.CommonConstants.DB_TIMEOUT;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-
 public class BookActivityUITest {
 
+    User testUser;
+
+    FirebaseAuth auth = FirebaseAuth.getInstance();
+    UserDB userDB = new UserDB(FirebaseFirestore.getInstance());
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    ExecutorService executor = new ThreadPoolExecutor(
+            1,
+            4,
+            DB_TIMEOUT,
+            TimeUnit.MILLISECONDS,
+            new LinkedBlockingDeque<Runnable>()
+    );
+
+    AuthenticationController authController;
+
     @Rule
-    public ActivityScenarioRule<MainActivity> activityRule
-            = new ActivityScenarioRule<>(MainActivity.class);
+    public ActivityScenarioRule<BookActivity> activityRule
+            = new ActivityScenarioRule<>(BookActivity.class);
 
     @Before
     public void setup() throws InterruptedException {
-        onView(withId(R.id.login_email))
-                .perform(typeText("rcravichan3@gmail.com"), closeSoftKeyboard());
-        onView(withId(R.id.login_password))
-                .perform(typeText("supertest"), closeSoftKeyboard());
+        authController = new AuthenticationController(userDB, auth, executor);
 
-        onView(withId(R.id.login_login)).perform(click());
-        wait(5000);
+        final Pair<String, String> emailAndPassword = new Pair<>(
+                "rcravichan3@gmail.com",
+                "supertest"
+        );
+        authController.makeLoginRequest(emailAndPassword.first, emailAndPassword.second, new AuthCallback() {
+            @Override
+            public void onSuccess(AuthResult authResult) {
+                Log.d("Log in", "log in");
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+
+            }
+        });
+        User superuser = new User("aPjWbp4MN7WG7RDZcnNCvBQg90J2", "BoromiSuperUser", "rcravichan3@gmail.com");
     }
 
     @Test
     public void testOwnerTabsSwitch() {
+
         onView(withId(R.id.tab_owned_books)).perform(click());
 
         // Click Owner Available
