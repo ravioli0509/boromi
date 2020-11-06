@@ -83,6 +83,12 @@ public class EditBookFragment extends DialogFragment {
       EditBookFragmentListener listener = (EditBookFragmentListener) getActivity();
       if (isNotNullOrEmpty(author_text) && isNotNullOrEmpty(title_text) && isNotNullOrEmpty(
           isbn_text)) {
+        if (imageBitmap == null && editingBook.getImg64() != null) {
+          ByteArrayInputStream b = new ByteArrayInputStream(
+              Base64.decode(editingBook.getImg64(), Base64.DEFAULT));
+          Bitmap bitmap = BitmapFactory.decodeStream(b);
+          imageBitmap = bitmap;
+        }
         listener.onEditComplete(editingBook.getBookId(), author_text, title_text, isbn_text,
             imageBitmap);
         dismiss();
