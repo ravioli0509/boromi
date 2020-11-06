@@ -4,6 +4,8 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
+import com.team41.boromi.controllers.AuthenticationController;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,6 +27,16 @@ public class ChangeTabUITest {
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule
             = new ActivityScenarioRule<>(MainActivity.class);
+
+    @Before
+    public void setup() {
+        onView(withId(R.id.login_email))
+                .perform(typeText("rcravichan3@gmail.com"), closeSoftKeyboard());
+        onView(withId(R.id.login_password))
+                .perform(typeText("supertest"), closeSoftKeyboard());
+
+        onView(withId(R.id.login_login)).perform(click());
+    }
 
     @Test
     public void testOwnerTabsSwitch() {
