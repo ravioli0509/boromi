@@ -95,7 +95,7 @@ public class EditUserFragment extends DialogFragment {
                     .show();
               }
             });
-
+            user.setEmail(email);
             BoromiModule.user = modifiedUser;
             successfulWrite = true;
             dismiss();
@@ -123,7 +123,7 @@ public class EditUserFragment extends DialogFragment {
                 .show();
           }
         });
-
+        user.setUsername(username);
         successfulWrite = true;
         BoromiModule.user = modifiedUser;
         dismiss();
