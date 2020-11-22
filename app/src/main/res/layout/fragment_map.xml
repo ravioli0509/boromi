@@ -30,7 +30,7 @@
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent" />
   <TextView
-    android:id="@+id/textView"
+    android:id="@+id/map_tooltip"
     android:layout_width="159dp"
     android:layout_height="wrap_content"
     android:layout_marginTop="32dp"

@@ -4,7 +4,6 @@ import static com.team41.boromi.constants.CommonConstants.BookStatus;
 import static com.team41.boromi.constants.CommonConstants.BookWorkflowStage;
 
 import androidx.annotation.Nullable;
-import com.google.android.gms.maps.model.LatLng;
 import com.team41.boromi.constants.CommonConstants.ExchangeStage;
 import java.io.Serializable;
 import java.util.UUID;
